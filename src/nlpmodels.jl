@@ -1,4 +1,4 @@
-
+# CPU model
 mutable struct CNLPModel{T, VT<:AbstractVector{T}} <: AbstractNLPModel{T,VT}
     meta::NLPModelMeta{T, VT}
     counters::NLPModels.Counters
@@ -170,3 +170,5 @@ function NLPModels.hess_coord!(nlp::CNLPModel, x::AbstractVector, y::AbstractVec
     end
     return H
 end
+
+# GPUModel
