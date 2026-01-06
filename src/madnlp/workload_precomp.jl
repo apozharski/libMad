@@ -143,6 +143,7 @@ end
     # We only precompile the basic solvers.
     for ls in ["CHOLMODSolver", "LapackCPUSolver", "LDLSolver", "MumpsSolver", "UmfpackSolver"]
         for kkt in keys(KKT_DICT)
+            println(kkt)
             GC.@preserve x0 lvar uvar lcon ucon begin
                 @compile_workload begin
                     try

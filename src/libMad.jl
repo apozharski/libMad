@@ -1,6 +1,8 @@
 module libMad
 using InteractiveUtils
 using MadNLP
+using MadNLP: SparseWrapperModel
+using CUDA
 using MadNLPHSL
 using MadNLPGPU
 using NLPModels
@@ -54,10 +56,10 @@ include("madnlp/stats.jl")
 #@opts_dict(MadNLPOptions{Cdouble}, MadNLPOptsDict, madnlp_type_dict)
 
 # Create stats
-@stats(madnlp, MadNLPExecutionStats{Cdouble, Vector{Cdouble}})
+@stats(madnlp, MadNLPExecutionStats)
 
 # Now create solver interface
-@solver(madnlp, MadNLPSolver{Cdouble,Vector{Cdouble}}, MadNLPOptsDict, MadNLPExecutionStats{Cdouble, Vector{Cdouble}})
+@solver(madnlp, MadNLPSolver{Cdouble,Vector{Cdouble}}, MadNLPOptsDict, MadNLPExecutionStats)
 
 # Precompile workload for madnlp
 include("madnlp/workload_precomp.jl")

@@ -1,15 +1,16 @@
 # TODO (@anton) In the future also handle abstract model types???
 
-function generate_create_solver(solname, solver_expr, optsdict_expr)
+function generate_create_solver(solname, solver_expr, optsdict_expr; model=CNLPModel{Cdouble,Vector{Cdouble}}, modelname="CNLPModel", suffix=Symbol())
 
-    push!(function_sigs, "int $(solname)_create_solver($(String(nameof(eval(solver_expr))))** solver_ptr_ptr, CNLPModel* nlp_ptr, OptsDict* opts_ptr)")
     base_solver = eval(nameof(eval(solver_expr)))
+    push!(function_sigs, "int $(solname)$(suffix)_create_solver($(String(nameof(eval(solver_expr))))** solver_ptr_ptr, $(modelname)* nlp_ptr, OptsDict* opts_ptr)")
+    
     return quote
-        Base.@ccallable function $(Symbol(solname, :_create_solver))(solver_ptr_ptr::Ptr{Ptr{Cvoid}},
+        Base.@ccallable function $(Symbol(solname, suffix, :_create_solver))(solver_ptr_ptr::Ptr{Ptr{Cvoid}},
                                                     nlp_ptr::Ptr{Cvoid},
                                                     opts_ptr::Ptr{Cvoid}
                                                     )::Cint
-            nlp = wrap_obj(CNLPModel{Cdouble,Vector{Cdouble}},nlp_ptr)
+            nlp = unsafe_pointer_to_objref(nlp_ptr) # why doesn't this work: nlp = wrap_obj($(model),nlp_ptr)
             opts = wrap_obj(OptsDict, opts_ptr)
             nt_opts = $(Symbol(solname,:_to_parameters))(opts)
             solver = $(base_solver)(nlp;
@@ -49,7 +50,7 @@ function generate_solve(solname, solver_expr, optsdict_expr, stats_expr)
         Base.@ccallable function $(Symbol(solname, :_solve))(solver_ptr::Ptr{Cvoid},
                                                              opts_ptr::Ptr{Cvoid},
                                                              stats_ptr_ptr::Ptr{Ptr{Cvoid}})::Cint
-            solver = wrap_obj($(solver_expr), solver_ptr)
+            solver = unsafe_pointer_to_objref(solver_ptr)# why doesn't this work: wrap_obj($(solver_expr), solver_ptr)
             opts = wrap_obj(OptsDict, opts_ptr)
             nt_opts = $(Symbol(solname,:_to_parameters))(opts)
 
@@ -68,6 +69,7 @@ macro solver(solname, solver_expr, optsdict_expr, stats_expr)
     return esc(
         quote
             $(generate_create_solver(solname, solver_expr, optsdict_expr))
+            $(generate_create_solver(solname, solver_expr, optsdict_expr, model=GPUNLPModel, modelname="GPUNLPModel", suffix=:_gpu))
             $(generate_delete_solver(solname, solver_expr, optsdict_expr))
             $(generate_solve(solname, solver_expr, optsdict_expr, stats_expr))
         end
