@@ -239,27 +239,27 @@ Base.@ccallable function libmad_gpunlpmodel_set_numerics(nlp_ptr::Ptr{Cvoid},
     nlp = unsafe_pointer_to_objref(nlp_ptr) # why doesn't this work: wrap_obj(GPUNLPModel, nlp_ptr)
     if x0 != C_NULL
         nlp.inner.meta.x0 .= wrap_ptr(x0, nlp.meta.nvar)
-        copyto!(nlp.inner.meta.x0, nlp.meta.x0)
+        copyto!(nlp.meta.x0, nlp.inner.meta.x0)
     end 
     if y0 != C_NULL
         nlp.inner.meta.y0 .= wrap_ptr(y0, nlp.meta.ncon)
-        copyto!(nlp.inner.meta.y0, nlp.meta.y0)
+        copyto!(nlp.meta.y0, nlp.inner.meta.y0)
     end
     if lvar != C_NULL
         nlp.inner.meta.lvar .= wrap_ptr(lvar, nlp.meta.nvar)
-        copyto!(nlp.inner.meta.lvar, nlp.meta.lvar)
+        copyto!(nlp.meta.lvar, nlp.inner.meta.lvar)
     end
     if uvar != C_NULL
         nlp.inner.meta.uvar .= wrap_ptr(uvar, nlp.meta.nvar)
-        copyto!(nlp.inner.meta.uvar, nlp.meta.uvar)
+        copyto!(nlp.meta.uvar, nlp.inner.meta.uvar)
     end
     if lcon != C_NULL
         nlp.inner.meta.lcon .= wrap_ptr(lcon, nlp.meta.ncon)
-        copyto!(nlp.inner.meta.lcon, nlp.meta.lcon)
+        copyto!(nlp.meta.lcon, nlp.inner.meta.lcon)
     end
     if ucon != C_NULL
         nlp.inner.meta.ucon .= wrap_ptr(ucon, nlp.meta.ncon)
-        copyto!(nlp.inner.meta.ucon, nlp.meta.ucon)
+        copyto!(nlp.meta.ucon, nlp.inner.meta.ucon)
     end
 
     return Cint(0)
