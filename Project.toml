@@ -5,6 +5,7 @@ authors = ["Anton Edvinovich Pozharskiy <anton.pozharskiy@imtek.uni-freiburg.de>
 
 [deps]
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+CUDA_Driver_jll = "4ee394cb-3365-5eb0-8335-949819d2adfc"
 GPUCompiler = "61eb1bfa-7361-4325-ad38-22787b887f55"
 HSL = "34c5aeac-e683-54a6-a0e9-6e0fdc586c50"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
