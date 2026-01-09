@@ -194,8 +194,6 @@ Base.@ccallable function libmad_gpunlpmodel_create(nlp_ptr_ptr::Ptr{Ptr{Cvoid}},
                                                    eval_grad_f::Ptr{Cvoid}, eval_jac_g::Ptr{Cvoid},
                                                    eval_h::Ptr{Cvoid},
                                                    user_data::Ptr{Cvoid})::Cint
-    CUDA.versioninfo()
-    println(CUDA.libcuda)
     meta = NLPModelMeta(
         nvar,
         ncon = ncon,
