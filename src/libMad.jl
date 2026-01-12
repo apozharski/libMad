@@ -1,4 +1,14 @@
 module libMad
+
+function __init__()
+    println("dllist at __init__ time")
+    println.(Libdl.dllist());
+    CUDA.versioninfo()
+    println("CUDA.local_toolkit: $(CUDA.local_toolkit)")
+    println("CUDA.toolkit_version: $(CUDA.toolkit_version)")
+    println("Depot Path: $(Base.DEPOT_PATH)")
+end
+
 using InteractiveUtils
 using MadNLP
 using MadNLP: SparseWrapperModel
@@ -9,7 +19,10 @@ using NLPModels
 using PrecompileTools: @setup_workload, @compile_workload, verbose
 using Base: unsafe_convert
 using SolverCore
+using Libdl
 
+println("dllist list at compile_time:")
+println.(Libdl.dllist());
 # Store of references to libMad objects, to prevent garbage collection.
 libmad_refs::Dict{Ptr, Any} = Dict{Ptr, Any}()
 
@@ -53,7 +66,6 @@ const madnlp_type_dict = Dict(
 include("madnlp/stats.jl")
 
 @opts(madnlp, MadNLPOptions{Cdouble}, libMad.madnlp_type_dict)
-#@opts_dict(MadNLPOptions{Cdouble}, MadNLPOptsDict, madnlp_type_dict)
 
 # Create stats
 @stats(madnlp, MadNLPExecutionStats)
