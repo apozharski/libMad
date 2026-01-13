@@ -60,6 +60,9 @@ Base.@ccallable function libmad_nlpmodel_create(nlp_ptr_ptr::Ptr{Ptr{Cvoid}},
     return Cint(0)
 end
 
+# TODO(@anton) This currently can cause weird issues if called out of order with `create_solver`
+#              because it only changes the underlying model's numerics and not the wrapped model
+#              though that is already broken.
 push!(function_sigs, """int libmad_nlpmodel_set_numerics(CNLPModel* nlp_ptr,
                                                          const libmad_real* x0, const libmad_real* y0,
                                                          const libmad_real* lvar, const libmad_real* uvar,
@@ -169,96 +172,4 @@ function NLPModels.hess_coord!(nlp::CNLPModel, x::AbstractVector, y::AbstractVec
         throw(Exception("CallbackError eval_hess_l"))
     end
     return H
-end
-
-# GPUModel
-const GPUNLPModel = MadNLP.SparseWrapperModel{Cdouble, CuVector{Cdouble}, Cdouble, Vector{Clonglong}, Vector{Cdouble}, CNLPModel{Cdouble,Vector{Cdouble}}}
-push!(dummy_structs, "GPUNLPModel")
-push!(function_sigs, """int libmad_gpunlpmodel_create(GPUNLPModel** nlp_ptr_ptr,
-                                                      const char* name,
-                                                      libmad_int nvar, libmad_int ncon,
-                                                      libmad_int nnzj, libmad_int nnzh,
-                                                      NlpConstrJacStructure jac_struct, NlpLagHessStructure hess_struct,
-                                                      NlpEvalObj eval_f, NlpEvalConstr eval_g,
-                                                      NlpEvalObjGrad eval_grad_f, NlpEvalConstrJac eval_jac_g,
-                                                      NlpEvalLagHess eval_h,
-                                                      void* user_data)"""
-      )
-
-Base.@ccallable function libmad_gpunlpmodel_create(nlp_ptr_ptr::Ptr{Ptr{Cvoid}},
-                                                   name::Cstring,
-                                                   nvar::Clonglong, ncon::Clonglong,
-                                                   nnzj::Clonglong, nnzh::Clonglong,
-                                                   jac_struct::Ptr{Cvoid}, hess_struct::Ptr{Cvoid},
-                                                   eval_f::Ptr{Cvoid}, eval_g::Ptr{Cvoid},
-                                                   eval_grad_f::Ptr{Cvoid}, eval_jac_g::Ptr{Cvoid},
-                                                   eval_h::Ptr{Cvoid},
-                                                   user_data::Ptr{Cvoid})::Cint
-    meta = NLPModelMeta(
-        nvar,
-        ncon = ncon,
-        nnzj = nnzj,
-        nnzh = nnzh,
-        name = unsafe_string(name),
-        minimize = true
-    )
-
-    nlp = CNLPModel(
-        meta,
-        NLPModels.Counters(),
-        jac_struct,
-        hess_struct,
-        eval_f,
-        eval_g,
-        eval_grad_f,
-        eval_jac_g,
-        eval_h,
-        user_data
-    )
-
-    gpu_nlp = MadNLP.SparseWrapperModel(CuVector,nlp)
-    nlp_ptr = Ptr{CNLPModel{Cdouble, Vector{Cdouble}}}(pointer_from_objref(gpu_nlp))
-    unsafe_store!(nlp_ptr_ptr, nlp_ptr)
-    libmad_refs[nlp_ptr] = gpu_nlp
-    return Cint(0)
-end
-
-push!(function_sigs, """int libmad_gpunlpmodel_set_numerics(GPUNLPModel* nlp_ptr,
-                                                            const libmad_real* x0, const libmad_real* y0,
-                                                            const libmad_real* lvar, const libmad_real* uvar,
-                                                            const libmad_real* lcon, const libmad_real* ucon
-                                                           )"""
-      )
-Base.@ccallable function libmad_gpunlpmodel_set_numerics(nlp_ptr::Ptr{Cvoid},
-                                                         x0::Ptr{Cdouble}, y0::Ptr{Cdouble},
-                                                         lvar::Ptr{Cdouble}, uvar::Ptr{Cdouble},
-                                                         lcon::Ptr{Cdouble}, ucon::Ptr{Cdouble},
-                                                         )::Cint
-    nlp = unsafe_pointer_to_objref(nlp_ptr) # why doesn't this work: wrap_obj(GPUNLPModel, nlp_ptr)
-    if x0 != C_NULL
-        nlp.inner.meta.x0 .= wrap_ptr(x0, nlp.meta.nvar)
-        copyto!(nlp.meta.x0, nlp.inner.meta.x0)
-    end 
-    if y0 != C_NULL
-        nlp.inner.meta.y0 .= wrap_ptr(y0, nlp.meta.ncon)
-        copyto!(nlp.meta.y0, nlp.inner.meta.y0)
-    end
-    if lvar != C_NULL
-        nlp.inner.meta.lvar .= wrap_ptr(lvar, nlp.meta.nvar)
-        copyto!(nlp.meta.lvar, nlp.inner.meta.lvar)
-    end
-    if uvar != C_NULL
-        nlp.inner.meta.uvar .= wrap_ptr(uvar, nlp.meta.nvar)
-        copyto!(nlp.meta.uvar, nlp.inner.meta.uvar)
-    end
-    if lcon != C_NULL
-        nlp.inner.meta.lcon .= wrap_ptr(lcon, nlp.meta.ncon)
-        copyto!(nlp.meta.lcon, nlp.inner.meta.lcon)
-    end
-    if ucon != C_NULL
-        nlp.inner.meta.ucon .= wrap_ptr(ucon, nlp.meta.ncon)
-        copyto!(nlp.meta.ucon, nlp.inner.meta.ucon)
-    end
-
-    return Cint(0)
 end

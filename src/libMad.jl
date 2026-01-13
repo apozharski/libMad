@@ -64,6 +64,7 @@ const madnlp_type_dict = Dict(
 )
 
 include("madnlp/stats.jl")
+include("madnlp/gpu.jl")
 
 @opts(madnlp, MadNLPOptions{Cdouble}, libMad.madnlp_type_dict)
 

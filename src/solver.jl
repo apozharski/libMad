@@ -13,6 +13,8 @@ function generate_create_solver(solname, solver_expr, optsdict_expr; model=CNLPM
             nlp = unsafe_pointer_to_objref(nlp_ptr) # why doesn't this work: nlp = wrap_obj($(model),nlp_ptr)
             opts = wrap_obj(OptsDict, opts_ptr)
             nt_opts = $(Symbol(solname,:_to_parameters))(opts)
+            # see if we have to wrap the model in in a wrapped model:
+            nlp = gpuconvert($(base_solver), opts, nlp)
             solver = $(base_solver)(nlp;
                                     nt_opts...
                                    )
@@ -53,13 +55,21 @@ function generate_solve(solname, solver_expr, optsdict_expr, stats_expr)
             solver = unsafe_pointer_to_objref(solver_ptr)# why doesn't this work: wrap_obj($(solver_expr), solver_ptr)
             opts = wrap_obj(OptsDict, opts_ptr)
             nt_opts = $(Symbol(solname,:_to_parameters))(opts)
+            # Prealloc a stats so we always set a stats_ptr even on rethrown error,
+            # TODO(@anton): we should maybe call update! anyway? maybe in the solver itself.
+            stats = $(stats_expr)(solver)
+            status = 0
+            try
+                stats = solve!(solver.nlp, solver, stats; nt_opts...)
+            catch e
+                status = solver.status
+            finally
+                stats_ptr = pointer_from_objref(stats)
+                unsafe_store!(stats_ptr_ptr, stats_ptr)
+                libmad_refs[stats_ptr] = stats
+            end
 
-            stats = solve!(solver; nt_opts...)
-            stats_ptr = pointer_from_objref(stats)
-            unsafe_store!(stats_ptr_ptr, stats_ptr)
-            libmad_refs[stats_ptr] = stats
-
-            return Cint(0)
+            return Cint(status)
         end
     end
 end
@@ -69,7 +79,6 @@ macro solver(solname, solver_expr, optsdict_expr, stats_expr)
     return esc(
         quote
             $(generate_create_solver(solname, solver_expr, optsdict_expr))
-            $(generate_create_solver(solname, solver_expr, optsdict_expr, model=GPUNLPModel, modelname="GPUNLPModel", suffix=:_gpu))
             $(generate_delete_solver(solname, solver_expr, optsdict_expr))
             $(generate_solve(solname, solver_expr, optsdict_expr, stats_expr))
         end

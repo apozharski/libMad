@@ -62,7 +62,7 @@ int hess_coord(double obj_weight, const double* x, const double* y, double* H, v
 
 int main(int argc, char** argv)
 {
-  GPUNLPModel* nlp_ptr;
+  CNLPModel* nlp_ptr;
   OptsDict* opts_ptr;
   MadNLPSolver* solver_ptr;
   MadNLPExecutionStats* stats_ptr;
@@ -78,22 +78,22 @@ int main(int argc, char** argv)
   double* ucon = malloc(1*sizeof(double));
   ucon[0] = 1;
 
-  libmad_gpunlpmodel_create(&nlp_ptr, "test_model",
-			    2, 1,
-			    2, 2,
-			    &jac_structure, &hess_structure,
-			    &obj, &cons,
-			    &grad, &jac_coord,
-			    &hess_coord,
-			    NULL);
-  libmad_gpunlpmodel_set_numerics(nlp_ptr,
-			       x0, NULL,
-			       lvar, uvar,
-			       lcon, ucon);
+  libmad_nlpmodel_create(&nlp_ptr, "test_model",
+												 2, 1,
+												 2, 2,
+												 &jac_structure, &hess_structure,
+												 &obj, &cons,
+												 &grad, &jac_coord,
+												 &hess_coord,
+												 NULL);
+  libmad_nlpmodel_set_numerics(nlp_ptr,
+															 x0, NULL,
+															 lvar, uvar,
+															 lcon, ucon);
 
   libmad_create_options_dict(&opts_ptr);
   libmad_set_string_option(opts_ptr, "linear_solver", "CUDSSSolver");
-  madnlp_gpu_create_solver(&solver_ptr, nlp_ptr, opts_ptr);
+  madnlp_create_solver(&solver_ptr, nlp_ptr, opts_ptr);
   madnlp_solve(solver_ptr, opts_ptr, &stats_ptr);
 
   bool success;
