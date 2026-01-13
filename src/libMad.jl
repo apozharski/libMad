@@ -1,28 +1,25 @@
 module libMad
 
 function __init__()
-    println("dllist at __init__ time")
-    println.(Libdl.dllist());
-    CUDA.versioninfo()
-    println("CUDA.local_toolkit: $(CUDA.local_toolkit)")
-    println("CUDA.toolkit_version: $(CUDA.toolkit_version)")
     println("Depot Path: $(Base.DEPOT_PATH)")
 end
 
 using InteractiveUtils
 using MadNLP
 using MadNLP: SparseWrapperModel
-using CUDA
 using MadNLPHSL
-using MadNLPGPU
 using NLPModels
 using PrecompileTools: @setup_workload, @compile_workload, verbose
 using Base: unsafe_convert
 using SolverCore
-using Libdl
 
-println("dllist list at compile_time:")
-println.(Libdl.dllist());
+const cuda_available = @static if haskey(ENV, "LIBMAD_BUILD_GPU") && ENV["LIBMAD_BUILD_GPU"] == "true" true else false end
+
+@static if cuda_available
+    using CUDA
+    using MadNLPGPU
+end
+
 # Store of references to libMad objects, to prevent garbage collection.
 libmad_refs::Dict{Ptr, Any} = Dict{Ptr, Any}()
 
@@ -64,7 +61,9 @@ const madnlp_type_dict = Dict(
 )
 
 include("madnlp/stats.jl")
-include("madnlp/gpu.jl")
+@static if cuda_available
+    include("madnlp/gpu.jl")
+end
 
 @opts(madnlp, MadNLPOptions{Cdouble}, libMad.madnlp_type_dict)
 

@@ -74,6 +74,9 @@ function generate_solve(solname, solver_expr, optsdict_expr, stats_expr)
     end
 end
 
+# Generic gpu convert that does nothing.
+gpuconvert(::Type, opts::OptsDict, nlp::CNLPModel) = nlp
+
 macro solver(solname, solver_expr, optsdict_expr, stats_expr)
     push!(dummy_structs, String(nameof(eval(solver_expr))))
     return esc(
