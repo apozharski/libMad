@@ -43,7 +43,7 @@ jobs:
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake .. -DLIBMAD_BUILD_GPU="true" -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
     - name: trim out unnecessary artifacts
-      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.repository }} ${{ github.repository }}/scripts/trim_cuda_artifacts.jl)
+      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
 
   build_windows:
     name: Build binaries - windows-latest
@@ -65,7 +65,7 @@ jobs:
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target INSTALL --config Release
     - name: trim out unnecessary artifacts
-      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.repository }} ${{ github.repository }}/scripts/trim_cuda_artifacts.jl)
+      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
 
   build_apple:
     name: Build binaries - mac-latest
@@ -86,4 +86,4 @@ jobs:
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
     - name: trim out unnecessary artifacts
-      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.repository }} ${{ github.repository }}/scripts/trim_cuda_artifacts.jl)
+      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
