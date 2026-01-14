@@ -21,7 +21,7 @@ jobs:
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
     - name: trim out unnecessary artifacts
-      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.repository }} ${{ github.repository }}/scripts/trim_cuda_artifacts.jl)
+      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
 
   build_linux_gpu:
     name: Build binaries with gpu - ubuntu-latest
