@@ -14,6 +14,9 @@ for pkg in pkgs
     parsed_art = Artifacts.parse_toml(art)
     art_names = keys(parsed_art)
     for art_name in art_names
-        println(Artifacts.artifact_hash(art_name, art))
+        hash = Artifacts.artifact_hash(art_name, art)
+        if hash !== nothing # because windows is bad
+            println(hash)
+        end
     end
 end
