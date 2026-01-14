@@ -1,8 +1,8 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.3"
+julia_version = "1.12.4"
 manifest_format = "2.0"
-project_hash = "e7446b95eae9fa511b1210003a8bd0110368cf30"
+project_hash = "e05a9a75f231aa738c6b928452e543f22c239329"
 
 [[deps.AMD]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse_jll"]
@@ -78,7 +78,9 @@ version = "0.5.0"
 
 [[deps.CUDA]]
 deps = ["AbstractFFTs", "Adapt", "BFloat16s", "CEnum", "CUDA_Compiler_jll", "CUDA_Driver_jll", "CUDA_Runtime_Discovery", "CUDA_Runtime_jll", "Crayons", "DataFrames", "ExprTools", "GPUArrays", "GPUCompiler", "GPUToolbox", "KernelAbstractions", "LLVM", "LLVMLoopInfo", "LazyArtifacts", "Libdl", "LinearAlgebra", "Logging", "NVTX", "Preferences", "PrettyTables", "Printf", "Random", "Random123", "RandomNumbers", "Reexport", "SparseArrays", "StaticArrays", "Statistics", "demumble_jll"]
-path = "../CUDA.jl"
+git-tree-sha1 = "2c8e919f303fc16ab29721974d1130c66216a9ed"
+repo-rev = "df004da"
+repo-url = "https://github.com/apozharski/CUDA.jl.git"
 uuid = "052768ef-5323-5732-b1bb-66c8b64840ba"
 version = "5.9.5"
 
@@ -120,9 +122,9 @@ version = "0.19.2+0"
 
 [[deps.CUDSS]]
 deps = ["CEnum", "CUDA", "CUDA_Runtime_Discovery", "CUDSS_jll", "GPUToolbox", "LinearAlgebra", "SparseArrays"]
-path = "../CUDSS.jl"
+git-tree-sha1 = "e0eef65a4ed261d39e8d334f6595efb22a2e4643"
 uuid = "45b445bb-4962-46a0-9369-b4df9d0f772e"
-version = "0.6.5"
+version = "0.6.6"
 
 [[deps.CUDSS_jll]]
 deps = ["Artifacts", "CUDA_Runtime_jll", "CompilerSupportLibraries_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "TOML"]
@@ -243,7 +245,9 @@ version = "0.2.0"
 
 [[deps.GPUCompiler]]
 deps = ["ExprTools", "InteractiveUtils", "LLVM", "Libdl", "Logging", "PrecompileTools", "Preferences", "Scratch", "Serialization", "TOML", "Tracy", "UUIDs"]
-path = "../GPUCompiler.jl"
+git-tree-sha1 = "f7fb24ebc976799be1e1bc752d4c818d54541a59"
+repo-rev = "de4599b"
+repo-url = "https://github.com/apozharski/GPUCompiler.jl.git"
 uuid = "61eb1bfa-7361-4325-ad38-22787b887f55"
 version = "1.7.5"
 
@@ -453,7 +457,9 @@ version = "0.5.16"
 
 [[deps.MadNLP]]
 deps = ["LDLFactorizations", "LinearAlgebra", "Logging", "MUMPS_seq_jll", "NLPModels", "OpenBLAS32_jll", "Pkg", "PrecompileTools", "Printf", "SolverCore", "SparseArrays", "SuiteSparse"]
-path = "../MadNLP.jl"
+git-tree-sha1 = "0e4725fa9ce98b7787f3dff9eaf912702f57480b"
+repo-rev = "78f1bd"
+repo-url = "https://github.com/MadNLP/MadNLP.jl.git"
 uuid = "2621e9c9-9eb4-46b1-8089-e8c72242dfb6"
 version = "0.8.12"
 
@@ -465,7 +471,10 @@ version = "0.8.12"
 
 [[deps.MadNLPGPU]]
 deps = ["AMD", "CUDA", "CUDSS", "KernelAbstractions", "LinearAlgebra", "MadNLP", "Metis", "SparseArrays"]
-path = "../MadNLP.jl/lib/MadNLPGPU"
+git-tree-sha1 = "60a123367faffde0965634cba60d31e65ca12f55"
+repo-rev = "78f1bd"
+repo-subdir = "lib/MadNLPGPU"
+repo-url = "https://github.com/MadNLP/MadNLP.jl.git"
 uuid = "d72a61cc-809d-412f-99be-fd81f4b8a598"
 version = "0.7.18"
 
@@ -510,7 +519,7 @@ version = "1.2.0"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
-version = "2025.5.20"
+version = "2025.11.4"
 
 [[deps.NLPModels]]
 deps = ["FastClosures", "LinearAlgebra", "LinearOperators", "Printf", "SparseArrays"]
@@ -808,7 +817,7 @@ uuid = "1e29f10c-031c-5a83-9565-69cddfc27673"
 version = "1.3.0+0"
 
 [[deps.libMad]]
-deps = ["CUDA", "CUDA_Driver_jll", "CUDA_Runtime_jll", "GPUCompiler", "HSL", "InteractiveUtils", "Libdl", "MadNLP", "MadNLPGPU", "MadNLPHSL", "NLPModels", "PrecompileTools", "SolverCore"]
+deps = ["CUDA", "CUDA_Driver_jll", "CUDA_Runtime_jll", "CUDSS", "GPUCompiler", "HSL", "InteractiveUtils", "Libdl", "MadNLP", "MadNLPGPU", "MadNLPHSL", "NLPModels", "PrecompileTools", "SolverCore"]
 path = "."
 uuid = "3cb06f27-fa54-49c1-aeea-14d13a711cb4"
 version = "0.1.0"
