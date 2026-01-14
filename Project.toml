@@ -21,6 +21,8 @@ SolverCore = "ff4d7338-4cf1-434d-91df-b86cb86fb843"
 
 [compat]
 CUDA = "5.9.5"
+CUDA_Driver_jll = "13.1.0"
+CUDA_Runtime_jll = "0.19.2"
 CUDSS = "0.6.6"
 GPUCompiler = "1.7.5"
 HSL = "0.5.2"
