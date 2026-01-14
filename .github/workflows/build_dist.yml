@@ -20,6 +20,31 @@ jobs:
       run: echo "$HOME/.julia/bin" >> "$GITHUB_PATH"
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
+    - name: trim out unnecessary artifacts
+      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.repository }} ${{ github.repository }}/scripts/trim_cuda_artifacts.jl)
+
+  build_linux_gpu:
+    name: Build binaries - ubuntu-latest
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        julia-version: ['1']
+    steps:
+    - uses: actions/checkout@v4
+    - uses: julia-actions/install-juliaup@v2
+      with:
+        channel: ${{ matrix.julia-version }}
+    # Get a patched version of JuliaC
+    - name: install JuliaC
+      run: julia -e 'using Pkg; Pkg.add(url="https://github.com/apozharski/JuliaC.jl.git"); Pkg.Apps.add(url="https://github.com/apozharski/JuliaC.jl.git")'
+    - name: add JuliaC to path
+      run: echo "$HOME/.julia/bin" >> "$GITHUB_PATH"
+    - name: build libMad
+      run: mkdir build && cd build && mkdir install && cmake .. -DLIBMAD_BUILD_GPU="true" -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
+    - name: trim out unnecessary artifacts
+      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.repository }} ${{ github.repository }}/scripts/trim_cuda_artifacts.jl)
+
   build_windows:
     name: Build binaries - windows-latest
     runs-on: windows-latest
@@ -39,6 +64,9 @@ jobs:
       shell: pwsh
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target INSTALL --config Release
+    - name: trim out unnecessary artifacts
+      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.repository }} ${{ github.repository }}/scripts/trim_cuda_artifacts.jl)
+
   build_apple:
     name: Build binaries - mac-latest
     runs-on: macos-latest
@@ -57,10 +85,5 @@ jobs:
       run: echo "$HOME/.julia/bin" >> "$GITHUB_PATH"
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
-    - name: tar output
-      run: |
-        cd build/install && tar -czf ../../libMad-apple-aarch64.tar.gz *
-    - uses: actions/upload-artifact@v4
-      with:
-        name: libMad-apple-aarch64
-        path: libMad-apple-aarch64.tar.gz
+    - name: trim out unnecessary artifacts
+      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.repository }} ${{ github.repository }}/scripts/trim_cuda_artifacts.jl)
