@@ -24,7 +24,7 @@ jobs:
       run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.repository }} ${{ github.repository }}/scripts/trim_cuda_artifacts.jl)
 
   build_linux_gpu:
-    name: Build binaries - ubuntu-latest
+    name: Build binaries with gpu - ubuntu-latest
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
