@@ -22,6 +22,8 @@ jobs:
       run: julia -e 'using Pkg; Pkg.add(url="https://github.com/apozharski/JuliaC.jl.git"); Pkg.Apps.add(url="https://github.com/apozharski/JuliaC.jl.git")'
     - name: add JuliaC to path
       run: echo "$HOME/.julia/bin" >> "$GITHUB_PATH"
+    - name: Instantiate packages
+      run: julia --project=. -e "using Pkg; Pkg.instantiate()"
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
     - name: trim out unnecessary artifacts
@@ -54,6 +56,8 @@ jobs:
       run: julia -e 'using Pkg; Pkg.add(url="https://github.com/apozharski/JuliaC.jl.git"); Pkg.Apps.add(url="https://github.com/apozharski/JuliaC.jl.git")'
     - name: add JuliaC to path
       run: echo "$HOME/.julia/bin" >> "$GITHUB_PATH"
+    - name: Instantiate packages
+      run: julia --project=. -e "using Pkg; Pkg.instantiate()"
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake ..  -DLIBMAD_BUILD_GPU="true" -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
     - name: trim out unnecessary artifacts
@@ -86,6 +90,8 @@ jobs:
     - name: add JuliaC to path
       run: echo "PATH=$HOME\.julia\bin;$env:PATH" >> $env:GITHUB_ENV
       shell: pwsh
+    - name: Instantiate packages
+      run: julia --project=. -e "using Pkg; Pkg.instantiate()"
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target INSTALL --config Release
     - name: trim out unnecessary artifacts
@@ -118,6 +124,8 @@ jobs:
       run: julia -e 'using Pkg; Pkg.add(url="https://github.com/apozharski/JuliaC.jl.git"); Pkg.Apps.add(url="https://github.com/apozharski/JuliaC.jl.git")'
     - name: add JuliaC to path
       run: echo "$HOME/.julia/bin" >> "$GITHUB_PATH"
+    - name: Instantiate packages
+      run: julia --project=. -e "using Pkg; Pkg.instantiate()"
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
     - name: tar output
