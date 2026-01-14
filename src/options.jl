@@ -205,7 +205,6 @@ function generate_string_to_type_checks(typedict_expr)
         end
         push!(checks, check)
     end
-    println(checks)
     return quote
         $(checks...)
     end
