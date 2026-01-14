@@ -256,10 +256,6 @@ install(
   DESTINATION "."
 )
 install(
-  PROGRAMS $<SHELL_PATH:${LIBMAD_BIN_PATH}/julia>
-  DESTINATION bin
-)
-install(
   FILES
     ${LIBMAD_HEADER}
   DESTINATION
