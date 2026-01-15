@@ -68,12 +68,14 @@ jobs:
       run: |
         function quiet_rm($items)
         {
-        foreach($item in $items)
-        if (Test-Path $item) {
-          echo "  Removing $item"
-          Remove-Item $item  -r -force
-        }
-        }
+          foreach($item in $items)
+          {
+            if (Test-Path $item)
+            {
+              echo "  Removing $item"
+              Remove-Item $item  -r -force
+            }
+          }
         }
         cd build/install/share/julia/artifacts && quiet_rm $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
 
