@@ -3,7 +3,7 @@ module libMad
 function __init__()
     println("Depot Path: $(Base.DEPOT_PATH)")
 end
-
+using Preferences
 using InteractiveUtils
 using MadNLP
 using MadNLP: SparseWrapperModel
