@@ -24,7 +24,7 @@ jobs:
       run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
 
   build_linux_gpu:
-    name: Build binaries with gpu - ubuntu-latest
+    name: Build binaries with gpu support - ubuntu-latest
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -79,6 +79,39 @@ jobs:
         }
         cd build/install/share/julia/artifacts && quiet_rm $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
 
+  build_windows_gpu:
+    name: Build binaries with gpu support - windows-latest
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        julia-version: ['1']
+    steps:
+    - uses: actions/checkout@v4
+    - uses: julia-actions/install-juliaup@v2
+      with:
+        channel: ${{ matrix.julia-version }}
+    - name: install JuliaC
+      run: julia -e 'using Pkg; Pkg.add(url="https://github.com/apozharski/JuliaC.jl.git"); Pkg.Apps.add(url="https://github.com/apozharski/JuliaC.jl.git")'
+    - name: add JuliaC to path
+      run: echo "PATH=$HOME\.julia\bin;$env:PATH" >> $env:GITHUB_ENV
+      shell: pwsh
+    - name: build libMad
+      run: mkdir build && cd build && mkdir install && cmake .. -DLIBMAD_BUILD_GPU="true" -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target INSTALL --config Release
+    - name: trim out unnecessary artifacts
+      run: |
+        function quiet_rm($items)
+        {
+          foreach($item in $items)
+          {
+            if (Test-Path $item)
+            {
+              echo "  Removing $item"
+              Remove-Item $item  -r -force
+            }
+          }
+        }
+        cd build/install/share/julia/artifacts && quiet_rm $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
   build_apple:
     name: Build binaries - mac-latest
     runs-on: macos-latest

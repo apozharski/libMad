@@ -2,7 +2,11 @@ module libMad
 
 function __init__()
     println("Depot Path: $(Base.DEPOT_PATH)")
+    println("LOAD Path: $(Base.LOAD_PATH)")
+    println("resolved load path: $(Base.load_path())")
+    println("resolved load path: $(Base.current_project())")
 end
+
 
 using InteractiveUtils
 using MadNLP
@@ -12,10 +16,11 @@ using NLPModels
 using PrecompileTools: @setup_workload, @compile_workload, verbose
 using Base: unsafe_convert
 using SolverCore
+using Preferences
 
-const cuda_available = @static if haskey(ENV, "LIBMAD_BUILD_GPU") && ENV["LIBMAD_BUILD_GPU"] == "true" true else false end
+const cuda_available = @load_preference("gpu", "false")
 
-@static if cuda_available
+@static if cuda_available == "true"
     using CUDA
     using MadNLPGPU
 end
@@ -61,7 +66,7 @@ const madnlp_type_dict = Dict(
 )
 
 include("madnlp/stats.jl")
-@static if cuda_available
+@static if cuda_available == "true"
     include("madnlp/gpu.jl")
 end
 

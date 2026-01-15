@@ -8,6 +8,7 @@ if(NOT JULIAC_FLAGS)
   set(JULIAC_FLAGS "")
 endif()
 option(WITH_EXAMPLE "Build basic example" ON)
+option(WITH_GPU "Build with GPU" OFF)
 
 # Set JULIA_HSL_LIBRARY_PATH.
 # TODO(@anton) Make this make sense for mac/windows?
@@ -116,6 +117,16 @@ endif()
 
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/include")
 
+if(WITH_GPU)
+  execute_process(
+    COMMAND "${JULIA_EXECUTABLE}" --project=${CMAKE_SOURCE_DIR} --startup-file=no "${CMAKE_SOURCE_DIR}/scripts/set_gpu_pref.jl" "true"
+  )
+else()
+  execute_process(
+    COMMAND "${JULIA_EXECUTABLE}" --project=${CMAKE_SOURCE_DIR} --startup-file=no "${CMAKE_SOURCE_DIR}/scripts/set_gpu_pref.jl" "false"
+  )
+endif()
+
 # SETUP VARIABLES BECAUSE WINDOWS IS HORRIBLE:
 if(LINUX OR APPLE)
   set(LIBMAD_SHARED_LIBRARY ${PROJECT_BINARY_DIR}/lib/libMad${CMAKE_SHARED_LIBRARY_SUFFIX})
@@ -180,13 +191,13 @@ message("${LIBMAD_SHARED_LIBRARY_DEPENDENCIES}")
 # SETUP THE BUILD
 add_custom_command(
   OUTPUT ${LIBMAD_JULIAC_OUTPUTS}
-  COMMAND ${JULIAC_EXECUTABLE} --verbose --compile-ccallable --bundle ${PROJECT_BINARY_DIR} --experimental ${JULIAC_FLAGS} --output-lib libMad ${PROJECT_SOURCE_DIR}
+  COMMAND ${CMAKE_COMMAND} -E env ${LIBMAD_ENV} ${JULIAC_EXECUTABLE} --verbose --include-preferences --compile-ccallable --bundle ${PROJECT_BINARY_DIR} --experimental ${JULIAC_FLAGS} --output-lib libMad ${PROJECT_SOURCE_DIR}
   DEPENDS ${LIBMAD_SHARED_LIBRARY_DEPENDENCIES}
 )
 
 add_custom_command(
   OUTPUT ${LIBMAD_HEADER}
-  COMMAND ${JULIA_EXECUTABLE} --project=${PROJECT_SOURCE_DIR} --startup-file=no ${LIBMAD_GENERATE_HEADERS_SCRIPT} ${LIBMAD_HEADER_PATH}
+  COMMAND ${CMAKE_COMMAND} -E env ${LIBMAD_ENV} ${JULIA_EXECUTABLE} --project=${PROJECT_SOURCE_DIR} --startup-file=no ${LIBMAD_GENERATE_HEADERS_SCRIPT} ${LIBMAD_HEADER_PATH}
   DEPENDS ${LIBMAD_HEADER_DEPENDENCIES}
 )
 
