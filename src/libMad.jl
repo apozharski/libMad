@@ -12,13 +12,8 @@ using NLPModels
 using PrecompileTools: @setup_workload, @compile_workload, verbose
 using Base: unsafe_convert
 using SolverCore
-
-const cuda_available = @static if haskey(ENV, "LIBMAD_BUILD_GPU") && ENV["LIBMAD_BUILD_GPU"] == "true" true else false end
-
-@static if cuda_available
-    using CUDA
-    using MadNLPGPU
-end
+using CUDA
+using MadNLPGPU
 
 # Store of references to libMad objects, to prevent garbage collection.
 libmad_refs::Dict{Ptr, Any} = Dict{Ptr, Any}()
@@ -61,9 +56,7 @@ const madnlp_type_dict = Dict(
 )
 
 include("madnlp/stats.jl")
-@static if cuda_available
-    include("madnlp/gpu.jl")
-end
+include("madnlp/gpu.jl")
 
 @opts(madnlp, MadNLPOptions{Cdouble}, libMad.madnlp_type_dict)
 

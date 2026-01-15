@@ -37,38 +37,6 @@ jobs:
         tag: ${{ github.ref }}
         body: "Release ${{ github.ref_name }}"
 
-  build_linux_gpu:
-    name: Build binaries with gpu - ubuntu-latest
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        julia-version: ['1']
-    steps:
-    - uses: actions/checkout@v4
-    - uses: julia-actions/install-juliaup@v2
-      with:
-        channel: ${{ matrix.julia-version }}
-    # Get a patched version of JuliaC
-    - name: install JuliaC
-      run: julia -e 'using Pkg; Pkg.add(url="https://github.com/apozharski/JuliaC.jl.git"); Pkg.Apps.add(url="https://github.com/apozharski/JuliaC.jl.git")'
-    - name: add JuliaC to path
-      run: echo "$HOME/.julia/bin" >> "$GITHUB_PATH"
-    - name: build libMad
-      run: mkdir build && cd build && mkdir install && cmake ..  -DLIBMAD_BUILD_GPU="true" -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
-    - name: trim out unnecessary artifacts
-      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
-    - name: tar output
-      run: cd build/install && tar -czf ../../libMad-gpu-ubuntu-x86_64-${{ github.ref_name }}.tar.gz *
-    - name: Upload binaries to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: libMad-gpu-ubuntu-x86_64-${{ github.ref_name }}.tar.gz
-        asset_name: libMad-ubuntu-gpu-x86_64-${{ github.ref_name }}.tar.gz
-        tag: ${{ github.ref }}
-        body: "Release ${{ github.ref_name }}"
-
   build_windows:
     name: Build binaries - windows-latest
     runs-on: windows-latest
