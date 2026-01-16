@@ -8,7 +8,7 @@ push!(function_sigs, """int libmad_mpccmodel_create(MPCCModel** mpcc_ptr_ptr,
                                                     libmad_int nvar, libmad_int ncon,
                                                     libmad_int nnzj, libmad_int nnzh,
                                                     libmad_int ncc,
-                                                    libmad_int* ind_cc1, libmad_int* ind_cc2
+                                                    libmad_int* ind_cc1, libmad_int* ind_cc2,
                                                     NlpConstrJacStructure jac_struct, NlpLagHessStructure hess_struct,
                                                     NlpEvalObj eval_f, NlpEvalConstr eval_g,
                                                     NlpEvalObjGrad eval_grad_f, NlpEvalConstrJac eval_jac_g,
