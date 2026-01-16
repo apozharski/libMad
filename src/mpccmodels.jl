@@ -15,17 +15,17 @@ push!(function_sigs, """int libmad_mpccmodel_create(MPCCModel** mpcc_ptr_ptr,
                                                     NlpEvalLagHess eval_h,
                                                     void* user_data)"""
       )
-Base.@ccallable function libmad_nlpmodel_create(mpcc_ptr_ptr::Ptr{Ptr{Cvoid}},
-                                                name::Cstring,
-                                                nvar::Clonglong, ncon::Clonglong,
-                                                nnzj::Clonglong, nnzh::Clonglong,
-                                                ncc::Clonglong,
-                                                ind_cc1::Ptr{Clonglong}, ind_cc2::Ptr{Clonglong},
-                                                jac_struct::Ptr{Cvoid}, hess_struct::Ptr{Cvoid},
-                                                eval_f::Ptr{Cvoid}, eval_g::Ptr{Cvoid},
-                                                eval_grad_f::Ptr{Cvoid}, eval_jac_g::Ptr{Cvoid},
-                                                eval_h::Ptr{Cvoid},
-                                                user_data::Ptr{Cvoid})::Cint
+Base.@ccallable function libmad_mpccmodel_create(mpcc_ptr_ptr::Ptr{Ptr{Cvoid}},
+                                                 name::Cstring,
+                                                 nvar::Clonglong, ncon::Clonglong,
+                                                 nnzj::Clonglong, nnzh::Clonglong,
+                                                 ncc::Clonglong,
+                                                 ind_cc1::Ptr{Clonglong}, ind_cc2::Ptr{Clonglong},
+                                                 jac_struct::Ptr{Cvoid}, hess_struct::Ptr{Cvoid},
+                                                 eval_f::Ptr{Cvoid}, eval_g::Ptr{Cvoid},
+                                                 eval_grad_f::Ptr{Cvoid}, eval_jac_g::Ptr{Cvoid},
+                                                 eval_h::Ptr{Cvoid},
+                                                 user_data::Ptr{Cvoid})::Cint
     meta = NLPModelMeta(
         nvar,
         ncon = ncon,
