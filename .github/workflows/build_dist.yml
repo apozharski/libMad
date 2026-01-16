@@ -1,5 +1,7 @@
 name: build
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  pull_request:
 jobs:
   build_linux:
     name: Build binaries - ubuntu-latest
