@@ -19,11 +19,14 @@ function primal_feas(stats::AbstractExecutionStats) end
 
 function dual_feas(stats::AbstractExecutionStats) end
 
+function cc_feas(stats::AbstractExecutionStats) end
+
 function status(stats::AbstractExecutionStats) end
 
 function get_n(stats::AbstractExecutionStats) end
 
 function get_m(stats::AbstractExecutionStats) end
+
 
 # macros for defining the stats interfaces
 function generate_stats_getters(solname, stats_expr)
@@ -172,12 +175,40 @@ function generate_delete_stats(solname, stats_expr)
     end
 end
 
+function generate_mpcc_stats_getters(solname, stats_expr)
+
+    push!(function_sigs, "int $(solname)_get_cc_feas($(String(nameof(eval(stats_expr))))* stats_ptr, libmad_real* out)")
+    _cc_feas = quote
+        Base.@ccallable function $(Symbol(solname, :_get_cc_feas))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
+            stats = wrap_obj($(stats_expr),stats_ptr)
+            unsafe_store!(out, cc_feas(stats))
+            return Cint(0)
+        end
+    end
+
+    return quote
+        $(_cc_feas)
+    end
+end
+
 macro stats(solname, stats_expr)
     push!(dummy_structs, "$(String(nameof(eval(stats_expr))))")
 
     return esc(
         quote
             $(generate_stats_getters(solname, stats_expr))
+            $(generate_delete_stats(solname, stats_expr))
+        end
+    )
+end
+
+macro mpcc_stats(solname, stats_expr)
+    push!(dummy_structs, "$(String(nameof(eval(stats_expr))))")
+
+    return esc(
+        quote
+            $(generate_stats_getters(solname, stats_expr))
+            $(generate_mpcc_stats_getters(solname, stats_expr))
             $(generate_delete_stats(solname, stats_expr))
         end
     )

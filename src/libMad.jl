@@ -66,4 +66,14 @@ include("madnlp/gpu.jl")
 # Precompile workload for madnlp
 include("madnlp/workload_precomp.jl")
 
+# MadMPEC
+using MadMPEC: MPCCModel, MPCCModelVarVar, IndexSet, MadNLPCExecutionStats
+include("mpccmodels.jl")
+
+@mpcc_stats(madnlpc, MadNLPCExecutionStats)
+# const madmpec_type_dict = Dict(
+#     "relaxation" => RLX_DICT
+# )
+# @opts(madnlp, MadNLPOptions{Cdouble}, libMad.madnlp_type_dict)
+
 end # module libMad
