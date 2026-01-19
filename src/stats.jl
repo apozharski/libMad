@@ -42,7 +42,7 @@ function generate_stats_getters(solname, stats_expr)
             stats = wrap_obj($(stats_expr),stats_ptr)
             #out_arr = unsafe_wrap(Vector{Cdouble}, out, get_n(stats))
             out_arr = wrap_ptr(out, get_n(stats))
-            out_arr .= solution(stats)
+            copyto!(out_arr, solution(stats))
             return Cint(0)
         end
     end
@@ -52,7 +52,7 @@ function generate_stats_getters(solname, stats_expr)
         Base.@ccallable function $(Symbol(solname, :_get_constraints))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
             stats = wrap_obj($(stats_expr),stats_ptr)
             out_arr = wrap_ptr(out, get_m(stats))
-            out_arr .= constraints(stats)
+            copyto!(out_arr, constraints(stats))
             return Cint(0)
         end
     end
@@ -62,7 +62,7 @@ function generate_stats_getters(solname, stats_expr)
         Base.@ccallable function $(Symbol(solname, :_get_multipliers))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
             stats = wrap_obj($(stats_expr),stats_ptr)
             out_arr = wrap_ptr(out, get_m(stats))
-            out_arr .= multipliers(stats)
+            copyto!(out_arr, multipliers(stats))
             return Cint(0)
         end
     end
@@ -72,7 +72,7 @@ function generate_stats_getters(solname, stats_expr)
         Base.@ccallable function $(Symbol(solname, :_get_multipliers_L))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
             stats = wrap_obj($(stats_expr),stats_ptr)
             out_arr = wrap_ptr(out, get_n(stats))
-            out_arr .= multipliers_L(stats)
+            copyto!(out_arr, multipliers_L(stats))
             return Cint(0)
         end
     end
@@ -82,7 +82,7 @@ function generate_stats_getters(solname, stats_expr)
         Base.@ccallable function $(Symbol(solname, :_get_multipliers_U))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
             stats = wrap_obj($(stats_expr),stats_ptr)
             out_arr = wrap_ptr(out, get_n(stats))
-            out_arr .= multipliers_U(stats)
+            copyto!(out_arr, multipliers_U(stats))
             return Cint(0)
         end
     end
@@ -92,7 +92,7 @@ function generate_stats_getters(solname, stats_expr)
         Base.@ccallable function $(Symbol(solname, :_get_bound_multipliers))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
             stats = wrap_obj($(stats_expr),stats_ptr)
             out_arr = wrap_ptr(out, get_n(stats))
-            out_arr .= multipliers_U(stats) .- multipliers_L(stats)
+            copyto!(out_arr, multipliers_U(stats) .- multipliers_L(stats)) # TODO(@anton) this allocates :(
             return Cint(0)
         end
     end

@@ -183,14 +183,27 @@ function generate_string_to_type_checks(typedict_expr)
     typedictdict = eval(typedict_expr) # get actual dict?
     checks = []
     for (path, typedict) in typedictdict
+        inner_checks = []
+
         for (tstring, type) in typedict
             check = quote
                 if path == $(path) && val == $(tstring)
                     params[path] = $(type)
                 end
             end
-            push!(checks, check)
+
+            push!(inner_checks, check)
         end
+        tstrings = [keys(typedict)]
+        check = quote
+            if path == $(path) && !haskey($(typedict), val)
+                delete!(params, path)
+                println("libMAD WARNING: option $(path) is of unknown type $(val), ignoring")
+            else
+                $(inner_checks...)
+            end
+        end
+        push!(checks, check)
     end
     return quote
         $(checks...)

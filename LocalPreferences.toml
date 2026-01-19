@@ -1,0 +1,6 @@
+[CUDA_Driver_jll]
+compat = "false"
+
+[CUDA_Runtime_jll]
+local = "true"
+version = "13.0"

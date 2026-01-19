@@ -120,9 +120,11 @@ file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/include")
 if(LINUX OR APPLE)
   set(LIBMAD_SHARED_LIBRARY ${PROJECT_BINARY_DIR}/lib/libMad${CMAKE_SHARED_LIBRARY_SUFFIX})
   set(LIBMAD_SHARED_LIBRARY_PATH ${PROJECT_BINARY_DIR}/lib)
+  set(LIBMAD_BIN_PATH ${PROJECT_BINARY_DIR}/bin)
 elseif(WIN32)
   set(LIBMAD_SHARED_LIBRARY ${PROJECT_BINARY_DIR}/bin/libMad${CMAKE_SHARED_LIBRARY_SUFFIX})
   set(LIBMAD_SHARED_LIBRARY_PATH ${PROJECT_BINARY_DIR}/bin)
+  set(LIBMAD_BIN_PATH ${PROJECT_BINARY_DIR}/bin)
 endif()
 set(LIBMAD_IMPLIB ${PROJECT_BINARY_DIR}/bin/libMad.imp.lib)
 set(LIBMAD_HEADER ${PROJECT_BINARY_DIR}/include/libMad.h)
@@ -184,7 +186,7 @@ add_custom_command(
 
 add_custom_command(
   OUTPUT ${LIBMAD_HEADER}
-  COMMAND ${JULIA_EXECUTABLE} --project --startup-file=no ${LIBMAD_GENERATE_HEADERS_SCRIPT} ${LIBMAD_HEADER_PATH}
+  COMMAND ${JULIA_EXECUTABLE} --project=${PROJECT_SOURCE_DIR} --startup-file=no ${LIBMAD_GENERATE_HEADERS_SCRIPT} ${LIBMAD_HEADER_PATH}
   DEPENDS ${LIBMAD_HEADER_DEPENDENCIES}
 )
 
@@ -232,6 +234,16 @@ if(WITH_EXAMPLE)
     "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib")  
   endif()
   target_link_libraries(no_hsl_example PRIVATE libMad)
+
+  add_executable(gpu_example $<SHELL_PATH:${PROJECT_SOURCE_DIR}/examples/gpu_example.c>)
+  if(APPLE)
+    set_target_properties(
+    gpu_example
+    PROPERTIES 
+    INSTALL_RPATH 
+    "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib")  
+  endif()
+  target_link_libraries(gpu_example PRIVATE libMad)
 endif()
 
 cmake_print_properties(TARGETS libMad
@@ -251,6 +263,7 @@ install(
 )
 install(
   DIRECTORY ${LIBMAD_BUNDLE_PATH}
+  USE_SOURCE_PERMISSIONS
   DESTINATION "."
 )
 
@@ -258,6 +271,8 @@ if(WITH_EXAMPLE)
   install(TARGETS basic_problem
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
   install(TARGETS no_hsl_example
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(TARGETS gpu_example
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 ## Export configs

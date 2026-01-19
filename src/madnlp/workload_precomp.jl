@@ -139,10 +139,14 @@ end
     uvar = Vector{Cdouble}([Inf, Inf])
     lcon = Vector{Cdouble}([0.0])
     ucon = Vector{Cdouble}([0.0])
-    # until we figure out a workaround for CUDA/HSL
-    # We only precompile the basic solvers.
-    for ls in ["CHOLMODSolver", "LapackCPUSolver", "LDLSolver", "MumpsSolver", "UmfpackSolver"]
+    # until we figure out a workaround for HSL we cannot precompile those solvers
+    linear_solvers = ["CHOLMODSolver", "LapackCPUSolver", "LDLSolver", "MumpsSolver", "UmfpackSolver"]
+    if CUDA.functional()
+        push!(linear_solvers, "CUDSSSolver")
+    end
+    for ls in linear_solvers
         for kkt in keys(KKT_DICT)
+            println(kkt)
             GC.@preserve x0 lvar uvar lcon ucon begin
                 @compile_workload begin
                     try
@@ -178,6 +182,7 @@ end
                         libMad.libmad_set_double_option(opts_ptr, unsafe_convert(Cstring,_tol), Cdouble(1e-6))
                         libMad.libmad_set_int64_option(opts_ptr, unsafe_convert(Cstring,_max_iter), 2000)
                         libMad.libmad_set_string_option(opts_ptr, unsafe_convert(Cstring,_callback), unsafe_convert(Cstring,_SparseCallback))
+                        libMad.libmad_set_int64_option(opts_ptr, unsafe_convert(Cstring,_print_level), Clonglong(MadNLP.ERROR))
                         libMad.libmad_set_string_option(opts_ptr, unsafe_convert(Cstring,_linear_solver), unsafe_convert(Cstring,ls))
                         libMad.libmad_set_bool_option(opts_ptr, unsafe_convert(Cstring,_hessian_constant), false)
 

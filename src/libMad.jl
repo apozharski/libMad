@@ -1,11 +1,16 @@
 module libMad
+
+using Preferences
 using InteractiveUtils
 using MadNLP
+using MadNLP: SparseWrapperModel
 using MadNLPHSL
 using NLPModels
 using PrecompileTools: @setup_workload, @compile_workload, verbose
 using Base: unsafe_convert
 using SolverCore
+using CUDA
+using MadNLPGPU
 
 # Store of references to libMad objects, to prevent garbage collection.
 libmad_refs::Dict{Ptr, Any} = Dict{Ptr, Any}()
@@ -48,15 +53,15 @@ const madnlp_type_dict = Dict(
 )
 
 include("madnlp/stats.jl")
+include("madnlp/gpu.jl")
 
 @opts(madnlp, MadNLPOptions{Cdouble}, libMad.madnlp_type_dict)
-#@opts_dict(MadNLPOptions{Cdouble}, MadNLPOptsDict, madnlp_type_dict)
 
 # Create stats
-@stats(madnlp, MadNLPExecutionStats{Cdouble, Vector{Cdouble}})
+@stats(madnlp, MadNLPExecutionStats)
 
 # Now create solver interface
-@solver(madnlp, MadNLPSolver{Cdouble,Vector{Cdouble}}, MadNLPOptsDict, MadNLPExecutionStats{Cdouble, Vector{Cdouble}})
+@solver(madnlp, MadNLPSolver{Cdouble,Vector{Cdouble}}, MadNLPOptsDict, MadNLPExecutionStats)
 
 # Precompile workload for madnlp
 include("madnlp/workload_precomp.jl")

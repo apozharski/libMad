@@ -1,4 +1,4 @@
-
+# CPU model
 mutable struct CNLPModel{T, VT<:AbstractVector{T}} <: AbstractNLPModel{T,VT}
     meta::NLPModelMeta{T, VT}
     counters::NLPModels.Counters
@@ -60,6 +60,9 @@ Base.@ccallable function libmad_nlpmodel_create(nlp_ptr_ptr::Ptr{Ptr{Cvoid}},
     return Cint(0)
 end
 
+# TODO(@anton) This currently can cause weird issues if called out of order with `create_solver`
+#              because it only changes the underlying model's numerics and not the wrapped model
+#              though that is already broken.
 push!(function_sigs, """int libmad_nlpmodel_set_numerics(CNLPModel* nlp_ptr,
                                                          const libmad_real* x0, const libmad_real* y0,
                                                          const libmad_real* lvar, const libmad_real* uvar,
@@ -99,7 +102,11 @@ function NLPModels.jac_structure!(nlp::CNLPModel, I::AbstractVector{T}, J::Abstr
     J_ = Base.unsafe_convert(Ptr{Clonglong}, J)
     ret = ccall(nlp.jac_struct, Cint, (Ptr{Clonglong}, Ptr{Clonglong}, Ptr{Cvoid}), I_, J_, nlp.user_data)
     if ret != Cint(0)
-        throw(Exception("CallbackError jac_struct"))
+        if ret == Cint(-5) # TODO(@anton) an actual enum here,
+            throw(InterruptException("User requested stop in jac_struct"))
+        else
+            throw(Exception("CallbackError jac_struct"))
+        end
     end
     return I, J
 end
@@ -109,7 +116,11 @@ function NLPModels.hess_structure!(nlp::CNLPModel, I::AbstractVector{T}, J::Abst
     J_ = Base.unsafe_convert(Ptr{Clonglong}, J)
     ret = ccall(nlp.hess_struct, Cint, (Ptr{Clonglong}, Ptr{Clonglong}, Ptr{Cvoid}), I_, J_, nlp.user_data)
     if ret != Cint(0)
-        throw(Exception("CallbackError hess_struct"))
+        if ret == Cint(-5) # TODO(@anton) an actual enum here,
+            throw(InterruptException("User requested stop in hess_struct"))
+        else
+            throw(Exception("CallbackError hess_struct"))
+        end
     end
     return I, J
 end
@@ -119,7 +130,11 @@ function NLPModels.obj(nlp::CNLPModel, x::AbstractVector)
     f = Vector{Cdouble}([0.0])
     ret::Cint = ccall(nlp.eval_f, Cint, (Ptr{Cdouble},Ptr{Cdouble}, Ptr{Cvoid}), x_, f, nlp.user_data)
     if ret != Cint(0)
-        throw(Exception("CallbackError eval_f"))
+        if ret == Cint(-5) # TODO(@anton) an actual enum here,
+            throw(InterruptException("User requested stop in eval_f"))
+        else
+            throw(Exception("CallbackError eval_f"))
+        end
     end
     return f[1]
 end
@@ -129,7 +144,11 @@ function NLPModels.cons!(nlp::CNLPModel, x::AbstractVector, c::AbstractVector)
     c_::Ptr{Cdouble} = Base.unsafe_convert(Ptr{Cdouble}, c)
     ret::Cint = ccall(nlp.eval_g, Cint, (Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cvoid}), x_, c_, nlp.user_data)
     if ret != Cint(0)
-        throw(Exception("CallbackError eval_cons"))
+        if ret == Cint(-5) # TODO(@anton) an actual enum here,
+            throw(InterruptException("User requested stop in eval_cons"))
+        else
+            throw(Exception("CallbackError eval_cons"))
+        end
     end
     return c
 end
@@ -140,7 +159,11 @@ function NLPModels.grad!(nlp::CNLPModel, x::AbstractVector, g::AbstractVector)
     g_::Ptr{Cdouble} = Base.unsafe_convert(Ptr{Cdouble}, g)
     ret::Cint = ccall(nlp.eval_grad_f, Cint, (Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cvoid}), x_, g_, nlp.user_data)
     if ret != Cint(0)
-        throw(Exception("CallbackError eval_grad_f"))
+        if ret == Cint(-5) # TODO(@anton) an actual enum here,
+            throw(InterruptException("User requested stop in eval_grad_f"))
+        else
+            throw(Exception("CallbackError eval_grad_f"))
+        end
     end
     return g
 end
@@ -151,7 +174,11 @@ function NLPModels.jac_coord!(nlp::CNLPModel, x::AbstractVector, J::AbstractVect
     J_::Ptr{Cdouble} = Base.unsafe_convert(Ptr{Cdouble}, J)
     ret::Cint = ccall(nlp.eval_jac_g, Cint, (Ptr{Cdouble},Ptr{Cdouble},Ptr{Cvoid}), x_, J_, nlp.user_data)
     if ret != Cint(0)
-        throw(Exception("CallbackError eval_jac_g"))
+        if ret == Cint(-5) # TODO(@anton) an actual enum here,
+            throw(InterruptException("User requested stop in eval_jac_g"))
+        else
+            throw(Exception("CallbackError eval_jac_g"))
+        end
     end
     return J
 end
@@ -166,7 +193,11 @@ function NLPModels.hess_coord!(nlp::CNLPModel, x::AbstractVector, y::AbstractVec
                       (Cdouble, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cvoid}),
                       obj_weight, x_, y_, H_, nlp.user_data)
     if ret != Cint(0)
-        throw(Exception("CallbackError eval_hess_l"))
+        if ret == Cint(-5) # TODO(@anton) an actual enum here,
+            throw(InterruptException("User requested stop in eval_hess_l"))
+        else
+            throw(Exception("CallbackError eval_hess_l"))
+        end
     end
     return H
 end
