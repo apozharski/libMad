@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Anton Edvinovich Pozharskiy <anton.pozharskiy@imtek.uni-freiburg.de>"]
 
 [deps]
+BFloat16s = "ab4f0b2a-ad5b-11e8-123f-65d77653426b"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 CUDA_Driver_jll = "4ee394cb-3365-5eb0-8335-949819d2adfc"
 CUDA_Runtime_jll = "76a88914-d11a-5bdc-97e0-2f5a05c973a2"
@@ -21,6 +22,7 @@ Preferences = "21216c6a-2e73-6563-6e65-726566657250"
 SolverCore = "ff4d7338-4cf1-434d-91df-b86cb86fb843"
 
 [compat]
+BFloat16s = "0.6.1"
 CUDA = "5.9.5"
 CUDA_Driver_jll = "13.1.0"
 CUDA_Runtime_jll = "0.19.2"
