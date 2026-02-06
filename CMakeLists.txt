@@ -244,6 +244,16 @@ if(WITH_EXAMPLE)
     "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib")  
   endif()
   target_link_libraries(gpu_example PRIVATE libMad)
+
+  add_executable(mpcc_example $<SHELL_PATH:${PROJECT_SOURCE_DIR}/examples/mpcc_example.c>)
+  if(APPLE)
+    set_target_properties(
+    mpcc_example
+    PROPERTIES 
+    INSTALL_RPATH 
+    "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib")  
+  endif()
+  target_link_libraries(mpcc_example PRIVATE libMad)
 endif()
 
 cmake_print_properties(TARGETS libMad
@@ -273,6 +283,8 @@ if(WITH_EXAMPLE)
   install(TARGETS no_hsl_example
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
   install(TARGETS gpu_example
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(TARGETS mpcc_example
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 ## Export configs

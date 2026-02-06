@@ -68,8 +68,9 @@ include("madnlp/workload_precomp.jl")
 
 # MadMPEC
 using MadMPEC
-using MadMPEC: MPCCModel, MPCCModelVarVar, IndexSet, MadNLPCExecutionStats, MadNLPCOptions
+using MadMPEC: MPCCModel, MPCCModelVarVar, IndexSet, MadNLPCExecutionStats, MadNLPCOptions, MadNLPCSolver, solve_homotopy!
 include("mpccmodels.jl")
+include("madnlpc/stats.jl")
 
 @concrete_dict RLX_DICT MadMPEC.AbstractMPCCRelaxation
 
@@ -79,4 +80,5 @@ const madnlpc_type_dict = Dict(
 )
 @opts(madnlpc, MadNLPCOptions{Cdouble}, libMad.madnlpc_type_dict)
 
+include("madnlpc/solver.jl")
 end # module libMad
