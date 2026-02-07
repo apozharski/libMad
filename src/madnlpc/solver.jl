@@ -50,7 +50,6 @@ Base.@ccallable function madnlpc_solve(solver_ptr::Ptr{Cvoid},
     # TODO(@anton): we should maybe call update! anyway? maybe in the solver itself.
     stats = MadNLPCExecutionStats(solver)
     status = 0
-    stats = solve_homotopy!(solver.rnlp, solver, stats; nt_opts...)
     try
         stats = solve_homotopy!(solver.rnlp, solver, stats; nt_opts...)
     catch e

@@ -59,7 +59,7 @@ int main(int argc, char** argv)
   MadNLPCExecutionStats* stats_ptr;
 
   double* x0 = malloc(2*sizeof(double));
-  x0[0] = 0; x0[1] = 0;
+  x0[0] = 0.5; x0[1] = 0.2;
   double* lvar = malloc(2*sizeof(double));
   lvar[0] = 0; lvar[1] = 0;
   double* uvar = malloc(2*sizeof(double));

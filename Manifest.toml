@@ -573,7 +573,7 @@ version = "0.5.16"
 
 [[deps.MadMPEC]]
 deps = ["DataStructures", "Gurobi", "HiGHS", "JuMP", "LinearAlgebra", "MadNLP", "MathOptInterface", "NLPModels", "Printf", "Serialization", "SolverCore", "SparseArrays"]
-git-tree-sha1 = "bf221067afd4a8b6ea2f4d30d89aa72025434faf"
+git-tree-sha1 = "372013d62cfd0b750e62bf8e0519181300ddf15c"
 repo-rev = "ap/libmad"
 repo-url = "git@github.com:MadNLP/MadMPEC.jl.git"
 uuid = "6689419a-93c1-455a-8ac6-77991ec4f86b"
