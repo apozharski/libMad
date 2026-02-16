@@ -213,8 +213,11 @@ end
 
 push!(function_sigs, "int libmad_create_options_dict(OptsDict** opts_ptr)")
 Base.@ccallable function libmad_create_options_dict(opts_ptr_ptr::Ptr{Ptr{Cvoid}})::Cint
+    println("WOW CREATING OPTIONS")
     opts = OptsDict()
+    println("WOW CREATED OPTIONS")
     opts_ptr = Ptr{OptsDict}(pointer_from_objref(opts))
+    println("created ptr")
     libmad_refs[opts_ptr] = opts
     unsafe_store!(opts_ptr_ptr, opts_ptr)
     return Cint(0)

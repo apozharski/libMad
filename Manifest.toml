@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.3"
+julia_version = "1.12.4"
 manifest_format = "2.0"
 project_hash = "b8edf6007a2148c35acbe5fadb9ff3dced61d93a"
 
@@ -573,9 +573,7 @@ version = "0.5.16"
 
 [[deps.MadMPEC]]
 deps = ["DataStructures", "Gurobi", "HiGHS", "JuMP", "LinearAlgebra", "MadNLP", "MathOptInterface", "NLPModels", "Printf", "Serialization", "SolverCore", "SparseArrays"]
-git-tree-sha1 = "372013d62cfd0b750e62bf8e0519181300ddf15c"
-repo-rev = "ap/libmad"
-repo-url = "git@github.com:MadNLP/MadMPEC.jl.git"
+path = "../MadMPEC.jl"
 uuid = "6689419a-93c1-455a-8ac6-77991ec4f86b"
 version = "0.1.0"
 
@@ -657,7 +655,7 @@ version = "1.11.0"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
-version = "2025.5.20"
+version = "2025.11.4"
 
 [[deps.MutableArithmetics]]
 deps = ["LinearAlgebra", "SparseArrays", "Test"]

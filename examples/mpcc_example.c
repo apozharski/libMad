@@ -70,21 +70,25 @@ int main(int argc, char** argv)
   ind_cc1[0] = 1;
   long long int* ind_cc2 = malloc(1*sizeof(long long int));
   ind_cc2[0] = 2;
+	long long int* cctypes = malloc(1*sizeof(long long int));
+	cctypes[0] = LIBMAD_MADMPEC_VARVAR;
 
   libmad_mpccmodel_create(&mpcc_ptr, "test_model",
-			  2, 0,
-			  0, 2,
-			  1,
-			  ind_cc1, ind_cc2,
-			  &jac_structure, &hess_structure,
-			  &obj, &cons,
-			  &grad, &jac_coord,
-			  &hess_coord,
-			  NULL);
+													2, 0,
+													0, 2,
+													1,
+													ind_cc1, ind_cc2,
+													cctypes,
+													&jac_structure, &hess_structure,
+													&obj, &cons,
+													&grad, &jac_coord,
+													&hess_coord,
+													NULL);
+
   libmad_mpccmodel_set_numerics(mpcc_ptr,
-				x0, NULL,
-				lvar, uvar,
-				lcon, ucon);
+																x0, NULL,
+																lvar, uvar,
+																lcon, ucon);
 
   libmad_create_options_dict(&nlp_opts_ptr);
   libmad_create_options_dict(&mpcc_opts_ptr);
