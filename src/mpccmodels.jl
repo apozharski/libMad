@@ -4,51 +4,19 @@
 
 push!(dummy_structs, "MPCCModel")
 push!(function_sigs, """int libmad_mpccmodel_create(MPCCModel** mpcc_ptr_ptr,
-                                                    const char* name,
-                                                    libmad_int nvar, libmad_int ncon,
-                                                    libmad_int nnzj, libmad_int nnzh,
+                                                    CNLPModel* nlp_ptr,
                                                     libmad_int ncc,
                                                     const libmad_int* ind_cc1, const libmad_int* ind_cc2,
-                                                    const libmad_int* cctypes,
-                                                    NlpConstrJacStructure jac_struct, NlpLagHessStructure hess_struct,
-                                                    NlpEvalObj eval_f, NlpEvalConstr eval_g,
-                                                    NlpEvalObjGrad eval_grad_f, NlpEvalConstrJac eval_jac_g,
-                                                    NlpEvalLagHess eval_h,
-                                                    void* user_data)"""
+                                                    const libmad_int* cctypes
+                                                    )"""
       )
 Base.@ccallable function libmad_mpccmodel_create(mpcc_ptr_ptr::Ptr{Ptr{Cvoid}},
-                                                 name::Cstring,
-                                                 nvar::Clonglong, ncon::Clonglong,
-                                                 nnzj::Clonglong, nnzh::Clonglong,
+                                                 nlp_ptr::Ptr{Cvoid},
                                                  ncc::Clonglong,
                                                  ind_cc1_ptr::Ptr{Clonglong}, ind_cc2_ptr::Ptr{Clonglong},
                                                  cctypes_ptr::Ptr{Clonglong},
-                                                 jac_struct::Ptr{Cvoid}, hess_struct::Ptr{Cvoid},
-                                                 eval_f::Ptr{Cvoid}, eval_g::Ptr{Cvoid},
-                                                 eval_grad_f::Ptr{Cvoid}, eval_jac_g::Ptr{Cvoid},
-                                                 eval_h::Ptr{Cvoid},
-                                                 user_data::Ptr{Cvoid})::Cint
-    meta = NLPModelMeta(
-        nvar,
-        ncon = ncon,
-        nnzj = nnzj,
-        nnzh = nnzh,
-        name = unsafe_string(name),
-        minimize = true
-    )
-
-    nlp = CNLPModel(
-        meta,
-        NLPModels.Counters(),
-        jac_struct,
-        hess_struct,
-        eval_f,
-        eval_g,
-        eval_grad_f,
-        eval_jac_g,
-        eval_h,
-        user_data
-    )
+                                                 )::Cint
+    nlp = wrap_obj(CNLPModel, nlp_ptr)
 
     # Copy the indices
     # TODO(@anton) is this inefficient?

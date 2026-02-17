@@ -14,8 +14,9 @@ Base.@ccallable function madnlpc_create_solver(solver_ptr_ptr::Ptr{Ptr{Cvoid}},
     nlp_nt_opts = madnlp_to_parameters(nlp_opts)
     mpcc_nt_opts = madnlpc_to_parameters(mpcc_opts)
 
-    madnlpc_opts = MadNLPCOptions{Cdouble}(mpcc_nt_opts...)
-    
+    madnlpc_opts = MadNLPCOptions{Cdouble}(;mpcc_nt_opts...)
+    println("NLP Options:")
+    println(nlp_nt_opts)
     solver = MadNLPCSolver(
         nlp;
         solver_opts=madnlpc_opts,
@@ -53,6 +54,7 @@ Base.@ccallable function madnlpc_solve(solver_ptr::Ptr{Cvoid},
     try
         stats = solve_homotopy!(solver.rnlp, solver, stats; nt_opts...)
     catch e
+        println(e)
         status = solver.ipm.status
     finally
         stats_ptr = pointer_from_objref(stats)
