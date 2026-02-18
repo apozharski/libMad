@@ -186,8 +186,29 @@ function generate_mpcc_stats_getters(solname, stats_expr)
         end
     end
 
+    push!(function_sigs, "int $(solname)_get_multipliers_x1($(String(nameof(eval(stats_expr))))* stats_ptr, libmad_real* out)")
+    _multipliers_x1 = quote
+        Base.@ccallable function $(Symbol(solname, :_get_multipliers_x1))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
+            stats = wrap_obj($(stats_expr),stats_ptr)
+            out_arr = wrap_ptr(out, get_ncc(stats))
+            copyto!(out_arr, multipliers_x1(stats))
+            return Cint(0)
+        end
+    end
+    push!(function_sigs, "int $(solname)_get_multipliers_x2($(String(nameof(eval(stats_expr))))* stats_ptr, libmad_real* out)")
+    _multipliers_x2 = quote
+        Base.@ccallable function $(Symbol(solname, :_get_multipliers_x2))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
+            stats = wrap_obj($(stats_expr),stats_ptr)
+            out_arr = wrap_ptr(out, get_ncc(stats))
+            copyto!(out_arr, multipliers_x2(stats))
+            return Cint(0)
+        end
+    end
+
     return quote
         $(_cc_feas)
+        $(_multipliers_x1)
+        $(_multipliers_x2)
     end
 end
 

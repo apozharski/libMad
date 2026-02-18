@@ -22,12 +22,24 @@ function multipliers_U(stats::MadNLPCExecutionStats{T, VT})::VT where {T,VT}
     return stats.multipliers_U
 end
 
+function multipliers_x1(stats::MadNLPCExecutionStats{T, VT})::VT where {T,VT}
+    return stats.multipliers_x1
+end
+
+function multipliers_x2(stats::MadNLPCExecutionStats{T, VT})::VT where {T,VT}
+    return stats.multipliers_x2
+end
+
 function get_n(stats::MadNLPCExecutionStats)::Int
     return length(stats.solution)
 end
 
 function get_m(stats::MadNLPCExecutionStats)::Int
     return length(stats.constraints)
+end
+
+function get_ncc(stats::MadNLPCExecutionStats)::Int
+    return length(stats.multipliers_x1)
 end
 
 function success(stats::MadNLPCExecutionStats{T, VT}) where {T,VT}

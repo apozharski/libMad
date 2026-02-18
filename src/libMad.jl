@@ -81,4 +81,7 @@ const madnlpc_type_dict = Dict(
 @opts(madnlpc, MadNLPCOptions{Cdouble}, libMad.madnlpc_type_dict)
 
 include("madnlpc/solver.jl")
+
+# Precompile workload for madnlp
+include("madnlpc/workload_precomp.jl")
 end # module libMad
