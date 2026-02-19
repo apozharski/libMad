@@ -54,7 +54,9 @@ Base.@ccallable function madnlpc_solve(solver_ptr::Ptr{Cvoid},
     try
         stats = solve_homotopy!(solver.rnlp, solver, stats; nt_opts...)
     catch e
-        println(e)
+        Base.printstyled("ERROR: "; color=:red, bold=true)
+        Base.showerror(stdout, e)
+        Base.show_backtrace(stdout, Base.catch_backtrace())
         status = solver.ipm.status
     finally
         stats_ptr = pointer_from_objref(stats)
