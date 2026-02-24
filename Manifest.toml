@@ -665,9 +665,9 @@ version = "1.6.7"
 
 [[deps.NLPModels]]
 deps = ["FastClosures", "LinearAlgebra", "LinearOperators", "Printf", "SparseArrays"]
-git-tree-sha1 = "ac58082a07f0bd559292e869770d462d7ad0a7e2"
+path = "../NLPModels.jl"
 uuid = "a4795742-8479-5a88-8948-cc11e1c8c1a6"
-version = "0.21.5"
+version = "0.21.9"
 
 [[deps.NVTX]]
 deps = ["JuliaNVTXCallbacks_jll", "Libdl", "NVTX_jll"]
