@@ -11,18 +11,44 @@ Base.@ccallable function madnlpc_create_solver(solver_ptr_ptr::Ptr{Ptr{Cvoid}},
     nlp = unsafe_pointer_to_objref(mpcc_ptr) # why doesn't this work: nlp = wrap_obj($(model),nlp_ptr)
     nlp_opts = wrap_obj(OptsDict, nlp_opts_ptr)
     mpcc_opts = wrap_obj(OptsDict, mpcc_opts_ptr)
-    nlp_nt_opts = madnlp_to_parameters(nlp_opts)
-    mpcc_nt_opts = madnlpc_to_parameters(mpcc_opts)
+    nlp_nt_opts = try
+        madnlp_to_parameters(nlp_opts)
+    catch e
+        Base.printstyled("ERROR: "; color=:red, bold=true)
+        Base.showerror(stdout, e)
+        Base.show_backtrace(stdout, Base.catch_backtrace())
+        return Cint(-1)
+    end
 
-    madnlpc_opts = MadNLPCOptions(;mpcc_nt_opts...)
-    println("NLP Options:")
-    println(nlp_nt_opts)
-    solver = MadNLPCSolver(
-        nlp;
-        solver_opts=madnlpc_opts,
-        nlp_nt_opts...
-            )
+    mpcc_nt_opts = try
+        madnlpc_to_parameters(mpcc_opts)
+    catch e
+        Base.printstyled("ERROR: "; color=:red, bold=true)
+        Base.showerror(stdout, e)
+        Base.show_backtrace(stdout, Base.catch_backtrace())
+        return Cint(-2)
+    end
 
+    madnlpc_opts = try
+        MadNLPCOptions(;mpcc_nt_opts...)
+    catch e
+        Base.printstyled("ERROR: "; color=:red, bold=true)
+        Base.showerror(stdout, e)
+        Base.show_backtrace(stdout, Base.catch_backtrace())
+        return Cint(-3)
+    end
+    solver = try
+        MadNLPCSolver(
+            nlp;
+            solver_opts=madnlpc_opts,
+            nlp_nt_opts...
+                )
+    catch e
+        Base.printstyled("ERROR: "; color=:red, bold=true)
+        Base.showerror(stdout, e)
+        Base.show_backtrace(stdout, Base.catch_backtrace())
+        return Cint(-4)
+    end
     solver_ptr = pointer_from_objref(solver)
     unsafe_store!(solver_ptr_ptr, solver_ptr)
     libmad_refs[solver_ptr] = solver
