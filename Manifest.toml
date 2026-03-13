@@ -433,17 +433,17 @@ git-tree-sha1 = "1e0228a030642014fe5cfe68c2c0a818f9e3f522"
 uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 version = "0.5.16"
 
-[[deps.]]
+[[deps.CCOpt]]
 deps = ["DataStructures", "LinearAlgebra", "MadNLP", "NLPModels", "Printf", "Serialization", "SolverCore", "SparseArrays"]
-path = "../.jl"
+path = "../CCOpt.jl"
 uuid = "6689419a-93c1-455a-8ac6-77991ec4f86b"
 version = "0.1.0"
 
-    [deps..extensions]
-    Gurobi = ["Gurobi"]
-    HiGHS = ["HiGHS"]
+    [deps.CCOpt.extensions]
+    CCOptGurobi = ["Gurobi"]
+    CCOptHiGHS = ["HiGHS"]
 
-    [deps..weakdeps]
+    [deps.CCOpt.weakdeps]
     Gurobi = "2e9cd046-0924-5485-92f1-d5272153d98b"
     HiGHS = "87dc4568-4c63-4d18-b0c0-bb2238e4078b"
 
