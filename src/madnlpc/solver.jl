@@ -1,7 +1,7 @@
 # For now we don't use the macro because of the weirdness with SolverCore API
-push!(dummy_structs, "MadNLPCSolver")
+push!(dummy_structs, "RelaxationSolver")
 
-push!(function_sigs, "int madnlpc_create_solver(MadNLPCSolver** solver_ptr_ptr, MPCCModel* mpcc_ptr, OptsDict* nlp_opts_ptr, OptsDict* mpcc_opts_ptr)")
+push!(function_sigs, "int madnlpc_create_solver(RelaxationSolver** solver_ptr_ptr, MPCCModel* mpcc_ptr, OptsDict* nlp_opts_ptr, OptsDict* mpcc_opts_ptr)")
 
 Base.@ccallable function madnlpc_create_solver(solver_ptr_ptr::Ptr{Ptr{Cvoid}},
                                                mpcc_ptr::Ptr{Cvoid},
@@ -30,7 +30,7 @@ Base.@ccallable function madnlpc_create_solver(solver_ptr_ptr::Ptr{Ptr{Cvoid}},
     end
 
     madnlpc_opts = try
-        MadNLPCOptions(;mpcc_nt_opts...)
+        RelaxationOptions(;mpcc_nt_opts...)
     catch e
         Base.printstyled("ERROR: "; color=:red, bold=true)
         Base.showerror(stdout, e)
@@ -38,7 +38,7 @@ Base.@ccallable function madnlpc_create_solver(solver_ptr_ptr::Ptr{Ptr{Cvoid}},
         return Cint(-3)
     end
     solver = try
-        MadNLPCSolver(
+        RelaxationSolver(
             nlp;
             solver_opts=madnlpc_opts,
             nlp_nt_opts...
@@ -56,7 +56,7 @@ Base.@ccallable function madnlpc_create_solver(solver_ptr_ptr::Ptr{Ptr{Cvoid}},
     return Cint(0)
 end
 
-push!(function_sigs, "int madnlpc_delete_solver(MadNLPCSolver* solver_ptr)")
+push!(function_sigs, "int madnlpc_delete_solver(RelaxationSolver* solver_ptr)")
 Base.@ccallable function madnlpc_delete_solver(solver_ptr::Ptr{Cvoid})::Cint
     if haskey(libmad_refs, solver_ptr)
         delete!(libmad_refs, solver_ptr)
@@ -66,7 +66,7 @@ Base.@ccallable function madnlpc_delete_solver(solver_ptr::Ptr{Cvoid})::Cint
     end
 end
 
-push!(function_sigs, "int madnlpc_solve(MadNLPCSolver* solver_ptr, OptsDict* nlp_opts_ptr, MadNLPCExecutionStats** stats_ptr_ptr)")
+push!(function_sigs, "int madnlpc_solve(RelaxationSolver* solver_ptr, OptsDict* nlp_opts_ptr, RelaxationExecutionStats** stats_ptr_ptr)")
 Base.@ccallable function madnlpc_solve(solver_ptr::Ptr{Cvoid},
                                        nlp_opts_ptr::Ptr{Cvoid},
                                        stats_ptr_ptr::Ptr{Ptr{Cvoid}})::Cint
@@ -75,7 +75,7 @@ Base.@ccallable function madnlpc_solve(solver_ptr::Ptr{Cvoid},
     nt_opts = madnlp_to_parameters(opts)
     # Prealloc a stats so we always set a stats_ptr even on rethrown error,
     # TODO(@anton): we should maybe call update! anyway? maybe in the solver itself.
-    stats = MadNLPCExecutionStats(solver)
+    stats = RelaxationExecutionStats(solver)
     status = 0
     try
         stats = solve_homotopy!(solver.rnlp, solver, stats; nt_opts...)

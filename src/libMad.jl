@@ -68,17 +68,17 @@ include("madnlp/workload_precomp.jl")
 
 # 
 using 
-using : MPCCModel, MPCCModelVarVar, IndexSet, MadNLPCExecutionStats, MadNLPCOptions, MadNLPCSolver, solve_homotopy!
+using : MPCCModel, MPCCModelVarVar, IndexSet, RelaxationExecutionStats, RelaxationOptions, RelaxationSolver, solve_homotopy!
 include("mpccmodels.jl")
 include("madnlpc/stats.jl")
 
 @concrete_dict RLX_DICT .AbstractMPCCRelaxation
 
-@mpcc_stats(madnlpc, MadNLPCExecutionStats)
+@mpcc_stats(madnlpc, RelaxationExecutionStats)
 const madnlpc_type_dict = Dict(
     "relaxation" => RLX_DICT
 )
-@opts(madnlpc, MadNLPCOptions{Cdouble}, libMad.madnlpc_type_dict)
+@opts(madnlpc, RelaxationOptions{Cdouble}, libMad.madnlpc_type_dict)
 
 include("madnlpc/solver.jl")
 

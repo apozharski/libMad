@@ -56,8 +56,8 @@ int main(int argc, char** argv)
   CNLPModel* nlp_ptr;
   OptsDict* nlp_opts_ptr;
   OptsDict* mpcc_opts_ptr;
-  MadNLPCSolver* solver_ptr;
-  MadNLPCExecutionStats* stats_ptr;
+  RelaxationSolver* solver_ptr;
+  RelaxationExecutionStats* stats_ptr;
 
   double* x0 = malloc(2*sizeof(double));
   x0[0] = 0.5; x0[1] = 0.2;
