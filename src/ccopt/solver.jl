@@ -1,7 +1,7 @@
 # For now we don't use the macro because of the weirdness with SolverCore API
-push!(dummy_structs, "RelaxationSolver")
+push!(dummy_structs, "CCOptRelaxationSolver")
 
-push!(function_sigs, "int ccopt_relaxation_create_solver(RelaxationSolver** solver_ptr_ptr, MPCCModel* mpcc_ptr, OptsDict* nlp_opts_ptr, OptsDict* mpcc_opts_ptr)")
+push!(function_sigs, "int ccopt_relaxation_create_solver(CCOptRelaxationSolver** solver_ptr_ptr, MPCCModel* mpcc_ptr, OptsDict* nlp_opts_ptr, OptsDict* mpcc_opts_ptr)")
 
 Base.@ccallable function ccopt_relaxation_create_solver(solver_ptr_ptr::Ptr{Ptr{Cvoid}},
                                                mpcc_ptr::Ptr{Cvoid},
@@ -56,7 +56,7 @@ Base.@ccallable function ccopt_relaxation_create_solver(solver_ptr_ptr::Ptr{Ptr{
     return Cint(0)
 end
 
-push!(function_sigs, "int ccopt_relaxation_delete_solver(RelaxationSolver* solver_ptr)")
+push!(function_sigs, "int ccopt_relaxation_delete_solver(CCOptRelaxationSolver* solver_ptr)")
 Base.@ccallable function ccopt_relaxation_delete_solver(solver_ptr::Ptr{Cvoid})::Cint
     if haskey(libmad_refs, solver_ptr)
         delete!(libmad_refs, solver_ptr)
@@ -66,7 +66,7 @@ Base.@ccallable function ccopt_relaxation_delete_solver(solver_ptr::Ptr{Cvoid}):
     end
 end
 
-push!(function_sigs, "int ccopt_relaxation_solve(RelaxationSolver* solver_ptr, OptsDict* nlp_opts_ptr, RelaxationExecutionStats** stats_ptr_ptr)")
+push!(function_sigs, "int ccopt_relaxation_solve(CCOptRelaxationSolver* solver_ptr, OptsDict* nlp_opts_ptr, RelaxationExecutionStats** stats_ptr_ptr)")
 Base.@ccallable function ccopt_relaxation_solve(solver_ptr::Ptr{Cvoid},
                                        nlp_opts_ptr::Ptr{Cvoid},
                                        stats_ptr_ptr::Ptr{Ptr{Cvoid}})::Cint
