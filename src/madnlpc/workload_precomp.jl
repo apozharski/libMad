@@ -104,20 +104,20 @@ ncc::Int64 = 1
                         libMad.libmad_set_string_option(opts_ptr, unsafe_convert(Cstring,_linear_solver), unsafe_convert(Cstring,ls))
                         libMad.libmad_set_bool_option(opts_ptr, unsafe_convert(Cstring,_hessian_constant), false)
 
-                        libMad.madnlpc_create_solver(solver_ptr_ptr, mpcc_ptr, opts_ptr, mpcc_opts_ptr)
+                        libMad.ccopt_relaxation_create_solver(solver_ptr_ptr, mpcc_ptr, opts_ptr, mpcc_opts_ptr)
                         solver_ptr = solver_ptr_vec[1]
-                        libMad.madnlpc_solve(solver_ptr, opts_ptr, stats_ptr_ptr)
+                        libMad.ccopt_relaxation_solve(solver_ptr, opts_ptr, stats_ptr_ptr)
                         stats_ptr = stats_ptr_vec[1]
 
-                        libMad.madnlpc_get_success(stats_ptr, pointer(o_success))
-                        libMad.madnlpc_get_obj(stats_ptr, pointer(o_obj))
-                        libMad.madnlpc_get_solution(stats_ptr, pointer(o_solution))
-                        libMad.madnlpc_get_multipliers(stats_ptr, pointer(o_multipliers))
-                        libMad.madnlpc_get_constraints(stats_ptr, pointer(o_constraints))
-                        libMad.madnlpc_get_multipliers_L(stats_ptr, pointer(o_multipliers_L))
-                        libMad.madnlpc_get_multipliers_U(stats_ptr, pointer(o_multipliers_U))
-                        libMad.madnlpc_get_multipliers_x1(stats_ptr, pointer(o_multipliers_x1))
-                        libMad.madnlpc_get_multipliers_x2(stats_ptr, pointer(o_multipliers_x2))
+                        libMad.ccopt_relaxation_get_success(stats_ptr, pointer(o_success))
+                        libMad.ccopt_relaxation_get_obj(stats_ptr, pointer(o_obj))
+                        libMad.ccopt_relaxation_get_solution(stats_ptr, pointer(o_solution))
+                        libMad.ccopt_relaxation_get_multipliers(stats_ptr, pointer(o_multipliers))
+                        libMad.ccopt_relaxation_get_constraints(stats_ptr, pointer(o_constraints))
+                        libMad.ccopt_relaxation_get_multipliers_L(stats_ptr, pointer(o_multipliers_L))
+                        libMad.ccopt_relaxation_get_multipliers_U(stats_ptr, pointer(o_multipliers_U))
+                        libMad.ccopt_relaxation_get_multipliers_x1(stats_ptr, pointer(o_multipliers_x1))
+                        libMad.ccopt_relaxation_get_multipliers_x2(stats_ptr, pointer(o_multipliers_x2))
 
                         println("success: $(o_success)")
                         println("obj: $(o_obj)")
@@ -129,7 +129,7 @@ ncc::Int64 = 1
                         println("multipliers_x2: $(o_multipliers_x1)")
                         println("multipliers_x2: $(o_multipliers_x2)")
 
-                        libMad.madnlpc_delete_solver(solver_ptr)
+                        libMad.ccopt_relaxation_delete_solver(solver_ptr)
                     catch e
                         Base.printstyled("ERROR: "; color=:red, bold=true)
                         Base.showerror(stdout, e)

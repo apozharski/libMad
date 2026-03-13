@@ -95,24 +95,24 @@ int main(int argc, char** argv)
 
   libmad_create_options_dict(&nlp_opts_ptr);
   libmad_create_options_dict(&mpcc_opts_ptr);
-  madnlpc_create_solver(&solver_ptr, mpcc_ptr, nlp_opts_ptr, mpcc_opts_ptr);
-  madnlpc_solve(solver_ptr, nlp_opts_ptr, &stats_ptr);
+  ccopt_relaxation_create_solver(&solver_ptr, mpcc_ptr, nlp_opts_ptr, mpcc_opts_ptr);
+  ccopt_relaxation_solve(solver_ptr, nlp_opts_ptr, &stats_ptr);
 
   bool success;
   double* solution = malloc(2*sizeof(double));
   double objective;
 
-  madnlpc_get_success(stats_ptr, &success);
-  madnlpc_get_solution(stats_ptr, solution);
-  madnlpc_get_obj(stats_ptr, &objective);
+  ccopt_relaxation_get_success(stats_ptr, &success);
+  ccopt_relaxation_get_solution(stats_ptr, solution);
+  ccopt_relaxation_get_obj(stats_ptr, &objective);
 
   printf("Success: %s\n", success ? "true" : "false");
   printf("Objective: %f\n", objective);
   printf("Solution: [%f, ", solution[0]);
   printf("%f]\n", solution[1]);
 
-  madnlpc_delete_solver(solver_ptr);
+  ccopt_relaxation_delete_solver(solver_ptr);
 
-  madnlpc_delete_stats(stats_ptr);
+  ccopt_relaxation_delete_stats(stats_ptr);
   return 0;
 }
