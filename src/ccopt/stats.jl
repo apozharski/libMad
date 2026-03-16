@@ -51,6 +51,10 @@ function iters(stats::RelaxationExecutionStats)
     return stats.iter
 end
 
+function total_wall_time(stats::RelaxationExecutionStats)
+    return stats.counters.counters.total_time
+end
+
 function primal_feas(stats::RelaxationExecutionStats{T}) where T
     return stats.primal_feas
 end

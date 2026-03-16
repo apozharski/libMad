@@ -24,10 +24,10 @@ Base.@ccallable function libmad_mpccmodel_create(mpcc_ptr_ptr::Ptr{Ptr{Cvoid}},
     ind_cc2 = IndexSet(undef, ncc)
     ind_cc1 .= wrap_ptr(ind_cc1_ptr, ncc)
     ind_cc2 .= wrap_ptr(ind_cc2_ptr, ncc)
-    cctypes = Vector{.CCType}(undef, ncc)
+    cctypes = Vector{CCOpt.CCType}(undef, ncc)
     cctypes_raw = wrap_ptr(cctypes_ptr, ncc)
     for i=1:ncc
-        cctypes[i] = .CCType(cctypes_raw[i])
+        cctypes[i] = CCOpt.CCType(cctypes_raw[i])
     end
 
     mpcc = MPCCModel(nlp, ind_cc1, ind_cc2, cctypes)

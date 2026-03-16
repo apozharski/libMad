@@ -15,6 +15,8 @@ function multipliers_U(stats::AbstractExecutionStats) end
 
 function iters(stats::AbstractExecutionStats) end
 
+function total_wall_time(stats::AbstractExecutionStats) end
+
 function primal_feas(stats::AbstractExecutionStats) end
 
 function dual_feas(stats::AbstractExecutionStats) end
@@ -118,6 +120,15 @@ function generate_stats_getters(solname, stats_expr)
         end
     end
 
+    push!(function_sigs, "int $(solname)_get_total_wall_time($(String(nameof(eval(stats_expr))))* stats_ptr, libmad_real* out)")
+    _total_wall_time = quote
+        Base.@ccallable function $(Symbol(solname, :_get_total_wall_time))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
+            stats = wrap_obj($(stats_expr),stats_ptr)
+            unsafe_store!(out, total_wall_time(stats))
+            return Cint(0)
+        end
+    end
+
     push!(function_sigs, "int $(solname)_get_primal_feas($(String(nameof(eval(stats_expr))))* stats_ptr, libmad_real* out)")
     _primal_feas = quote
         Base.@ccallable function $(Symbol(solname, :_get_primal_feas))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
@@ -155,6 +166,7 @@ function generate_stats_getters(solname, stats_expr)
         $(_bound_multipliers)
         $(_success)
         $(_iters)
+        $(_total_wall_time)
         $(_primal_feas)
         $(_dual_feas)
         $(_status)
