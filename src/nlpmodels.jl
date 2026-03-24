@@ -217,9 +217,7 @@ function NLPModels.jtprod!(
     v::AbstractVector,
     Jtv::AbstractVector,
 )
-    # TODO(@anton) do this in a smarter way?
-    Jtv[1:nlp.meta.nvar] .= jac(nlp, x)' * v
-    return Jtv
+
 end
 
 function NLPModels.jtprod_lin!(
@@ -228,9 +226,7 @@ function NLPModels.jtprod_lin!(
     v::AbstractVector,
     Jtv::AbstractVector,
 )
-    # TODO(@anton) do this in a smarter way?
-    Jtv[1:nlp.meta.nvar] .= jac_lin(nlp, x)' * v
-    return Jtv
+    return mul!(Jtv, jac_lin(nlp,x)', v)
 end
 
 function NLPModels.jtprod_nln!(
@@ -239,7 +235,5 @@ function NLPModels.jtprod_nln!(
     v::AbstractVector,
     Jtv::AbstractVector,
 )
-    # TODO(@anton) do this in a smarter way?
-    Jv[1:nlp.meta.nvar] .= jac_nln(nlp, x)' * v
-    return Jtv
+    return mul!(Jtv, jac_nln(nlp,x)', v)
 end
