@@ -136,8 +136,12 @@ set(LIBMAD_SHARED_LIBRARY_DEPENDENCIES
   ${PROJECT_SOURCE_DIR}/src/options.jl
   ${PROJECT_SOURCE_DIR}/src/solver.jl
   ${PROJECT_SOURCE_DIR}/src/stats.jl
-  ${PROJECT_SOURCE_DIR}/src/madnlp.jl
   ${PROJECT_SOURCE_DIR}/src/nlpmodels.jl
+  ${PROJECT_SOURCE_DIR}/src/mpccmodels.jl
+  ${PROJECT_SOURCE_DIR}/src/madnlp/gpu.jl
+  ${PROJECT_SOURCE_DIR}/src/madnlp/stats.jl
+  ${PROJECT_SOURCE_DIR}/src/ccopt/solver.jl
+  ${PROJECT_SOURCE_DIR}/src/ccopt/stats.jl
 )
 set(LIBMAD_GENERATE_HEADERS_SCRIPT ${PROJECT_SOURCE_DIR}/scripts/generate_headers.jl)
 set(LIBMAD_HEADER_DEPENDENCIES
@@ -146,8 +150,12 @@ set(LIBMAD_HEADER_DEPENDENCIES
   ${PROJECT_SOURCE_DIR}/src/options.jl
   ${PROJECT_SOURCE_DIR}/src/solver.jl
   ${PROJECT_SOURCE_DIR}/src/stats.jl
-  ${PROJECT_SOURCE_DIR}/src/madnlp.jl
   ${PROJECT_SOURCE_DIR}/src/nlpmodels.jl
+  ${PROJECT_SOURCE_DIR}/src/mpccmodels.jl
+  ${PROJECT_SOURCE_DIR}/src/madnlp/gpu.jl
+  ${PROJECT_SOURCE_DIR}/src/madnlp/stats.jl
+  ${PROJECT_SOURCE_DIR}/src/ccopt/solver.jl
+  ${PROJECT_SOURCE_DIR}/src/ccopt/stats.jl
   ${PROJECT_SOURCE_DIR}/scripts/generate_headers.jl
 )
 if(LINUX OR APPLE)

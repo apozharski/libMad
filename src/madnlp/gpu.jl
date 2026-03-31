@@ -5,7 +5,7 @@
 # TODO(@anton): this is type unstable.
 function gpuconvert(::Type{MadNLPSolver}, opts::OptsDict, nlp::CNLPModel)
     # TODO(@anton) is this a complete and sound list?
-    if haskey(opts, "linear_solver") && opts["linear_solver"] ∈ ["CUDSSSolver", "LapackGPUSolver"]
+    if haskey(opts, "linear_solver") && opts["linear_solver"] ∈ ("CUDSSSolver", "LapackGPUSolver")
         out = MadNLP.SparseWrapperModel(CuVector,nlp)
     else
         out = nlp

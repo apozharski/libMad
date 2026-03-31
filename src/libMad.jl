@@ -69,13 +69,13 @@ include("madnlp/workload_precomp.jl")
 
 # 
 using CCOpt
-using CCOpt: MPCCModel, MPCCModelVarVar, IndexSet, RelaxationExecutionStats, RelaxationOptions, RelaxationSolver, solve_homotopy!
+using CCOpt: MPCCModel, MPCCModelVarVar, IndexSet, CCOptExecutionStats, RelaxationOptions, RelaxationSolver, solve_homotopy!
 include("mpccmodels.jl")
 include("ccopt/stats.jl")
 
 @concrete_dict RLX_DICT CCOpt.AbstractMPCCRelaxation
 
-@mpcc_stats(ccopt_relaxation, RelaxationExecutionStats)
+@mpcc_stats(ccopt_relaxation, CCOptExecutionStats)
 const ccopt_relaxation_type_dict = Dict(
     "relaxation" => RLX_DICT
 )

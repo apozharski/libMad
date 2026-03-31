@@ -2,8 +2,10 @@
 # For now we only support vertical form
 # TODO(@anton) support non-vertical form creation. What is the best way to do that?
 
-push!(dummy_structs, "MPCCModel")
-push!(function_sigs, """int libmad_mpccmodel_create(MPCCModel** mpcc_ptr_ptr,
+const CMPCCModel = MPCCModel{Cdouble, Vector{Cdouble}}
+
+push!(dummy_structs, "CMPCCModel")
+push!(function_sigs, """int libmad_mpccmodel_create(CMPCCModel** mpcc_ptr_ptr,
                                                     CNLPModel* nlp_ptr,
                                                     libmad_int ncc,
                                                     const libmad_int* ind_cc1, const libmad_int* ind_cc2,
@@ -16,7 +18,7 @@ Base.@ccallable function libmad_mpccmodel_create(mpcc_ptr_ptr::Ptr{Ptr{Cvoid}},
                                                  ind_cc1_ptr::Ptr{Clonglong}, ind_cc2_ptr::Ptr{Clonglong},
                                                  cctypes_ptr::Ptr{Clonglong},
                                                  )::Cint
-    nlp = wrap_obj(CNLPModel, nlp_ptr)
+    nlp = wrap_obj(Base.RefValue{CNLPModel}, nlp_ptr)[]
 
     # Copy the indices
     # TODO(@anton) is this inefficient?
@@ -31,13 +33,14 @@ Base.@ccallable function libmad_mpccmodel_create(mpcc_ptr_ptr::Ptr{Ptr{Cvoid}},
     end
 
     mpcc = MPCCModel(nlp, ind_cc1, ind_cc2, cctypes)
-    mpcc_ptr = Ptr{MPCCModel{Cdouble, Vector{Cdouble}}}(pointer_from_objref(mpcc))
+    mpcc_ref = Ref(mpcc)
+    mpcc_ptr = Ptr{Base.RefValue{CMPCCModel}}(pointer_from_objref(mpcc_ref))
     unsafe_store!(mpcc_ptr_ptr, mpcc_ptr)
-    libmad_refs[mpcc_ptr] = mpcc
+    libmad_refs[mpcc_ptr] = mpcc_ref
     return Cint(0)
 end
 
-push!(function_sigs, """int libmad_mpccmodel_set_numerics(MPCCModel* mpcc_ptr,
+push!(function_sigs, """int libmad_mpccmodel_set_numerics(CMPCCModel* mpcc_ptr,
                                                           const libmad_real* x0, const libmad_real* y0,
                                                           const libmad_real* lvar, const libmad_real* uvar,
                                                           const libmad_real* lcon, const libmad_real* ucon
@@ -48,7 +51,7 @@ Base.@ccallable function libmad_mpccmodel_set_numerics(mpcc_ptr::Ptr{Cvoid},
                                                        lvar::Ptr{Cdouble}, uvar::Ptr{Cdouble},
                                                        lcon::Ptr{Cdouble}, ucon::Ptr{Cdouble},
                                                        )::Cint
-    mpcc = wrap_obj(MPCCModel, mpcc_ptr)
+    mpcc = wrap_obj(Base.RefValue{CMPCCModel}, mpcc_ptr)[]
     if x0 != C_NULL
         mpcc.meta.x0 .= wrap_ptr(x0, mpcc.meta.nvar)
     end

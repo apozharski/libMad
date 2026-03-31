@@ -1,6 +1,6 @@
-# TODO (@anton) In the future also handle abstract model types???
+# TODO (@anton) In the future also handle single (or quad!!) precision?
 
-function generate_create_solver(solname, solver_expr, optsdict_expr; model=CNLPModel{Cdouble,Vector{Cdouble}}, modelname="CNLPModel", suffix=Symbol())
+function generate_create_solver(solname, solver_expr, optsdict_expr; model=CNLPModel, modelname="CNLPModel", suffix=Symbol())
 
     base_solver = eval(nameof(eval(solver_expr)))
     push!(function_sigs, "int $(solname)$(suffix)_create_solver($(String(nameof(eval(solver_expr))))** solver_ptr_ptr, $(modelname)* nlp_ptr, OptsDict* opts_ptr)")
@@ -10,7 +10,7 @@ function generate_create_solver(solname, solver_expr, optsdict_expr; model=CNLPM
                                                     nlp_ptr::Ptr{Cvoid},
                                                     opts_ptr::Ptr{Cvoid}
                                                     )::Cint
-            nlp = unsafe_pointer_to_objref(nlp_ptr) # why doesn't this work: nlp = wrap_obj($(model),nlp_ptr)
+            nlp = wrap_obj(Base.RefValue{$(model)},nlp_ptr)[]
             opts = wrap_obj(OptsDict, opts_ptr)
             nt_opts = try
                 $(Symbol(solname,:_to_parameters))(opts)

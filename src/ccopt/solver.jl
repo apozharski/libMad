@@ -1,14 +1,14 @@
 # For now we don't use the macro because of the weirdness with SolverCore API
 push!(dummy_structs, "RelaxationSolver")
 
-push!(function_sigs, "int ccopt_relaxation_create_solver(RelaxationSolver** solver_ptr_ptr, MPCCModel* mpcc_ptr, OptsDict* nlp_opts_ptr, OptsDict* mpcc_opts_ptr)")
+push!(function_sigs, "int ccopt_relaxation_create_solver(RelaxationSolver** solver_ptr_ptr, CMPCCModel* mpcc_ptr, OptsDict* nlp_opts_ptr, OptsDict* mpcc_opts_ptr)")
 
 Base.@ccallable function ccopt_relaxation_create_solver(solver_ptr_ptr::Ptr{Ptr{Cvoid}},
                                                mpcc_ptr::Ptr{Cvoid},
                                                nlp_opts_ptr::Ptr{Cvoid},
                                                mpcc_opts_ptr::Ptr{Cvoid}
                                                )::Cint
-    nlp = unsafe_pointer_to_objref(mpcc_ptr) # why doesn't this work: nlp = wrap_obj($(model),nlp_ptr)
+    nlp = unsafe_pointer_to_objref(mpcc_ptr)[]
     nlp_opts = wrap_obj(OptsDict, nlp_opts_ptr)
     mpcc_opts = wrap_obj(OptsDict, mpcc_opts_ptr)
     nlp_nt_opts = try
@@ -66,7 +66,7 @@ Base.@ccallable function ccopt_relaxation_delete_solver(solver_ptr::Ptr{Cvoid}):
     end
 end
 
-push!(function_sigs, "int ccopt_relaxation_solve(RelaxationSolver* solver_ptr, OptsDict* nlp_opts_ptr, RelaxationExecutionStats** stats_ptr_ptr)")
+push!(function_sigs, "int ccopt_relaxation_solve(RelaxationSolver* solver_ptr, OptsDict* nlp_opts_ptr, CCOptExecutionStats** stats_ptr_ptr)")
 Base.@ccallable function ccopt_relaxation_solve(solver_ptr::Ptr{Cvoid},
                                        nlp_opts_ptr::Ptr{Cvoid},
                                        stats_ptr_ptr::Ptr{Ptr{Cvoid}})::Cint
@@ -75,7 +75,7 @@ Base.@ccallable function ccopt_relaxation_solve(solver_ptr::Ptr{Cvoid},
     nt_opts = madnlp_to_parameters(opts)
     # Prealloc a stats so we always set a stats_ptr even on rethrown error,
     # TODO(@anton): we should maybe call update! anyway? maybe in the solver itself.
-    stats = RelaxationExecutionStats(solver)
+    stats = CCOptExecutionStats(solver)
     status = 0
     try
         stats = solve_homotopy!(solver.rnlp, solver, stats; nt_opts...)

@@ -52,12 +52,12 @@ int hess_coord(double obj_weight, const double* x, const double* y, double* H, v
 
 int main(int argc, char** argv)
 {
-  MPCCModel* mpcc_ptr;
+  CMPCCModel* mpcc_ptr;
   CNLPModel* nlp_ptr;
   OptsDict* nlp_opts_ptr;
   OptsDict* mpcc_opts_ptr;
   RelaxationSolver* solver_ptr;
-  RelaxationExecutionStats* stats_ptr;
+  CCOptExecutionStats* stats_ptr;
 
   double* x0 = malloc(2*sizeof(double));
   x0[0] = 0.5; x0[1] = 0.2;

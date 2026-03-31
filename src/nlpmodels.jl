@@ -1,6 +1,6 @@
 # CPU model
-mutable struct CNLPModel{T, VT<:AbstractVector{T}} <: AbstractNLPModel{T,VT}
-    meta::NLPModelMeta{T, VT}
+struct CNLPModel <: AbstractNLPModel{Cdouble,Vector{Cdouble}}
+    meta::NLPModelMeta{Cdouble, Vector{Cdouble}}
     counters::NLPModels.Counters
     jac_struct::Ptr{Cvoid}
     hess_struct::Ptr{Cvoid}
@@ -42,7 +42,7 @@ Base.@ccallable function libmad_nlpmodel_create(nlp_ptr_ptr::Ptr{Ptr{Cvoid}},
                                                 eval_h::Ptr{Cvoid},
                                                 user_data::Ptr{Cvoid})::Cint
     meta = try
-        NLPModelMeta(
+        NLPModelMeta{Cdouble, Vector{Cdouble}}(
             nvar,
             ncon = ncon,
             nnzj = nnzj,
@@ -76,9 +76,10 @@ Base.@ccallable function libmad_nlpmodel_create(nlp_ptr_ptr::Ptr{Ptr{Cvoid}},
         Base.show_backtrace(stdout, Base.catch_backtrace())
         return Cint(-2)
     end
-    nlp_ptr = Ptr{CNLPModel{Cdouble, Vector{Cdouble}}}(pointer_from_objref(nlp))
+    nlp_ref = Ref(nlp)
+    nlp_ptr = Ptr{Base.RefValue{CNLPModel}}(pointer_from_objref(nlp_ref))
     unsafe_store!(nlp_ptr_ptr, nlp_ptr)
-    libmad_refs[nlp_ptr] = nlp
+    libmad_refs[nlp_ptr] = nlp_ref
     return Cint(0)
 end
 
@@ -96,7 +97,7 @@ Base.@ccallable function libmad_nlpmodel_set_numerics(nlp_ptr::Ptr{Cvoid},
                                                       lvar::Ptr{Cdouble}, uvar::Ptr{Cdouble},
                                                       lcon::Ptr{Cdouble}, ucon::Ptr{Cdouble},
                                                       )::Cint
-    nlp = wrap_obj(CNLPModel, nlp_ptr)
+    nlp = wrap_obj(Base.RefValue{CNLPModel}, nlp_ptr)[]
     if x0 != C_NULL
         nlp.meta.x0 .= wrap_ptr(x0, nlp.meta.nvar)
     end
