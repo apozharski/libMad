@@ -10,6 +10,7 @@ using PrecompileTools: @setup_workload, @compile_workload, verbose
 using Base: unsafe_convert
 using SolverCore
 using CUDA
+using CUDSS
 using MadNLPGPU
 
 # Store of references to libMad objects, to prevent garbage collection.

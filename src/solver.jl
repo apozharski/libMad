@@ -87,7 +87,7 @@ function generate_solve(solname, solver_expr, optsdict_expr, stats_expr)
             end
             status = 0
             try
-                stats = MadNLP.solve!(solver, stats; nt_opts...)
+                stats = SolverCore.solve!(solver, stats; nt_opts...)
             catch e
                 Base.printstyled("ERROR: "; color=:red, bold=true)
                 Base.showerror(stdout, e)
