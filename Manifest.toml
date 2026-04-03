@@ -2,7 +2,7 @@
 
 julia_version = "1.12.4"
 manifest_format = "2.0"
-project_hash = "1c0cdf50a9226690dd2a3d53c4d70f8c44fab385"
+project_hash = "73c13b8a625df65682dc99b9382ff4ce7e5ddc72"
 
 [[deps.AMD]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse_jll"]
@@ -122,13 +122,13 @@ version = "13.2.0+0"
 
 [[deps.CUDA_Runtime_Discovery]]
 deps = ["Libdl"]
-git-tree-sha1 = "f9a521f52d236fe49f1028d69e549e7f2644bb72"
+path = "../CUDA_Runtime_Discovery.jl"
 uuid = "1af6417a-86b4-443c-805f-a4643ffb695f"
 version = "1.0.0"
 
 [[deps.CUDA_Runtime_jll]]
 deps = ["Artifacts", "CUDA_Driver_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "TOML"]
-git-tree-sha1 = "af17d37b5b8b4d7525f8902eba1ef6141a9a7d3b"
+path = "../CUDA_Runtime_jll.jl"
 uuid = "76a88914-d11a-5bdc-97e0-2f5a05c973a2"
 version = "0.21.0+0"
 
@@ -766,7 +766,7 @@ uuid = "1e29f10c-031c-5a83-9565-69cddfc27673"
 version = "1.3.0+0"
 
 [[deps.libMad]]
-deps = ["BFloat16s", "CCOpt", "CUDA", "CUDSS", "GPUCompiler", "HSL", "InteractiveUtils", "Libdl", "MadNLP", "MadNLPGPU", "MadNLPHSL", "NLPModels", "PrecompileTools", "Preferences", "SolverCore"]
+deps = ["BFloat16s", "CCOpt", "CUDA", "CUDA_Driver_jll", "CUDA_Runtime_Discovery", "CUDA_Runtime_jll", "CUDSS", "GPUCompiler", "HSL", "InteractiveUtils", "Libdl", "MadNLP", "MadNLPGPU", "MadNLPHSL", "NLPModels", "PrecompileTools", "Preferences", "SolverCore"]
 path = "."
 uuid = "3cb06f27-fa54-49c1-aeea-14d13a711cb4"
 version = "0.1.0"

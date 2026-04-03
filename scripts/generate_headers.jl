@@ -27,10 +27,10 @@ open(joinpath(outpath,"libMad.h"), "w") do header
     #define libmad_int long long int
     #define libmad_real double
 
-    #define LIBMAD_MADMPEC_VARVAR 0
-    #define LIBMAD_MADMPEC_VARCON 1
-    #define LIBMAD_MADMPEC_CONVAR 2
-    #define LIBMAD_MADMPEC_CONCON 3
+    #define LIBMAD_CCOPT_VARVAR 0
+    #define LIBMAD_CCOPT_VARCON 1
+    #define LIBMAD_CCOPT_CONVAR 2
+    #define LIBMAD_CCOPT_CONCON 3
 
     // function pointer types
     typedef int (*NlpConstrJacStructure)(libmad_int*, libmad_int*, void*);
