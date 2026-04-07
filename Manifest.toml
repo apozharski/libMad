@@ -73,7 +73,7 @@ version = "1.11.0"
 
 [[deps.CCOpt]]
 deps = ["DataStructures", "LinearAlgebra", "MadNLP", "NLPModels", "Printf", "Serialization", "SolverCore", "SparseArrays"]
-git-tree-sha1 = "b9bea293ec73010f3b96a3acd6f1bd820d9977c1"
+git-tree-sha1 = "fd8d92aea5e2aa7572af8a053764176075eebfe0"
 repo-rev = "master"
 repo-url = "git@github.com:MadNLP/CCOpt.jl.git"
 uuid = "6689419a-93c1-455a-8ac6-77991ec4f86b"
