@@ -12,8 +12,6 @@ function _jac_struct(I::Vector{T}, J::Vector{T}) where T
     I[2] = 1
     J[1] = 1
     J[2] = 2
-    println(I)
-    println(J)
 end
 
 function _hess_struct(I::Vector{T}, J::Vector{T}) where T
@@ -23,8 +21,6 @@ function _hess_struct(I::Vector{T}, J::Vector{T}) where T
     J[1] = 1
     J[2] = 2
     J[3] = 2
-    println(I)
-    println(J)
 end
 
 function _eval_f!(w::Vector{T}, f::Vector{T}) where T
@@ -134,7 +130,6 @@ end
 
     x0 = Vector{Cdouble}([1.0, 1.0])
 
-    println(x0)
     lvar = Vector{Cdouble}([-Inf, -Inf])
     uvar = Vector{Cdouble}([Inf, Inf])
     lcon = Vector{Cdouble}([0.0])

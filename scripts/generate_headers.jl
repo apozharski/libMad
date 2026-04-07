@@ -1,13 +1,10 @@
-#println(Base.active_project())
 using Pkg
-#println(Pkg.status())
 Pkg.instantiate()
 using libMad
 # TODO(@anton) make this safer
 
 outpath = ARGS[1]
 open(joinpath(outpath,"libMad.h"), "w") do header
-    #println(header,"#include \"julia.h\"")
     # add Guard
     println(header, """
     #ifndef _LIBMAD_H

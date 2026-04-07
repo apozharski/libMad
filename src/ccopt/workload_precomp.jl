@@ -44,7 +44,6 @@ ncc::Int64 = 1
 
     x0 = Vector{Cdouble}([1.0, 1.0])
 
-    println(x0)
     lvar = Vector{Cdouble}([0, 0])
     uvar = Vector{Cdouble}([Inf, Inf])
     lcon = Vector{Cdouble}([0.0])

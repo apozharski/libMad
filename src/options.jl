@@ -229,7 +229,6 @@ for type in [Int64, Float64, Bool]
         Base.@ccallable function $(Symbol(fname))(opts_ptr::Ptr{Cvoid}, name::Cstring, val::$(Symbol(type)))::Cint
             opts = wrap_obj(OptsDict, opts_ptr)
             setindex!(opts, val, String(unsafe_string(name)))
-            println(opts)
             return Cint(0)
         end
     end
@@ -239,7 +238,6 @@ push!(function_sigs, "int libmad_set_string_option(OptsDict* opts_ptr, const cha
 Base.@ccallable function libmad_set_string_option(opts_ptr::Ptr{Cvoid}, name::Cstring, val::Cstring)::Cint
     opts = wrap_obj(OptsDict, opts_ptr)
     setindex!(opts, String(unsafe_string(val)), String(unsafe_string(name)))
-    println(opts)
     return Cint(0)
 end
 
@@ -323,7 +321,6 @@ function generate_to_parameters(prefix, typedict_expr, valid_paths, path_guards,
             # Takes a dict and walks it to create a flat dict with the proper types
             params = ConcreteOptsDict(opts)
             path_type_options = $(path_type_options)
-            println(params)
             $(generate_drop_invalid_options(valid_paths, path_guards))
             # Process sub-options structs
             for (path, typedict) in path_type_options
