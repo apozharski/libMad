@@ -50,8 +50,6 @@ jobs:
     - uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-    - run: echo "${{ env.JULIA_PKG_USE_CLI_GIT }}"
-    - run: echo $env:JULIA_PKG_USE_CLI_GIT
     - uses: julia-actions/install-juliaup@v2
       with:
         channel: ${{ matrix.julia-version }}
