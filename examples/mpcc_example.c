@@ -72,7 +72,7 @@ int main(int argc, char** argv)
   long long int* ind_cc2 = malloc(1*sizeof(long long int));
   ind_cc2[0] = 2;
 	long long int* cctypes = malloc(1*sizeof(long long int));
-	cctypes[0] = LIBMAD_MADMPEC_VARVAR;
+	cctypes[0] = LIBMAD_CCOPT_VARVAR;
 
   libmad_nlpmodel_create(&nlp_ptr, "test_model",
 												 2, 0,
