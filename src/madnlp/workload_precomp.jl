@@ -135,7 +135,11 @@ end
     lcon = Vector{Cdouble}([0.0])
     ucon = Vector{Cdouble}([0.0])
     # until we figure out a workaround for HSL we cannot precompile those solvers
-    linear_solvers = ["CHOLMODSolver", "LapackCPUSolver", "LDLSolver", "MumpsSolver", "UmfpackSolver", "CUDSSSolver"]
+    @static if !Sys.isapple()
+        linear_solvers = ["CHOLMODSolver", "LapackCPUSolver", "LDLSolver", "MumpsSolver", "UmfpackSolver", "CUDSSSolver"]
+    else
+        linear_solvers = ["CHOLMODSolver", "LapackCPUSolver", "LDLSolver", "MumpsSolver", "UmfpackSolver"]
+    end
     for ls in linear_solvers
         for kkt in keys(KKT_DICT)
             println("kkt: $(kkt), linear solver: $(ls)")

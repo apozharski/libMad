@@ -9,9 +9,11 @@ using NLPModels
 using PrecompileTools: @setup_workload, @compile_workload, verbose
 using Base: unsafe_convert
 using SolverCore
-using CUDA
-using CUDSS
-using MadNLPGPU
+@static if !Sys.isapple()
+    using CUDA
+    using CUDSS
+    using MadNLPGPU
+end
 
 # Store of references to libMad objects, to prevent garbage collection.
 libmad_refs::Dict{Ptr, Any} = Dict{Ptr, Any}()
@@ -54,7 +56,9 @@ const madnlp_type_dict = Dict(
 )
 
 include("madnlp/stats.jl")
-include("madnlp/gpu.jl")
+@static if !Sys.isapple()
+    include("madnlp/gpu.jl")
+end
 
 @opts(madnlp, MadNLPOptions{Cdouble}, libMad.madnlp_type_dict)
 
