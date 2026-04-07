@@ -14,7 +14,7 @@ Base.@ccallable function ccopt_relaxation_create_solver(solver_ptr_ptr::Ptr{Ptr{
     nlp_nt_opts = try
         madnlp_to_parameters(nlp_opts)
     catch e
-        Base.printstyled("ERROR: "; color=:red, bold=true)
+        Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
         Base.showerror(stdout, e)
         Base.show_backtrace(stdout, Base.catch_backtrace())
         return Cint(-1)
@@ -23,7 +23,7 @@ Base.@ccallable function ccopt_relaxation_create_solver(solver_ptr_ptr::Ptr{Ptr{
     mpcc_nt_opts = try
         ccopt_relaxation_to_parameters(mpcc_opts)
     catch e
-        Base.printstyled("ERROR: "; color=:red, bold=true)
+        Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
         Base.showerror(stdout, e)
         Base.show_backtrace(stdout, Base.catch_backtrace())
         return Cint(-2)
@@ -32,7 +32,7 @@ Base.@ccallable function ccopt_relaxation_create_solver(solver_ptr_ptr::Ptr{Ptr{
     ccopt_relaxation_opts = try
         RelaxationOptions(;mpcc_nt_opts...)
     catch e
-        Base.printstyled("ERROR: "; color=:red, bold=true)
+        Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
         Base.showerror(stdout, e)
         Base.show_backtrace(stdout, Base.catch_backtrace())
         return Cint(-3)
@@ -44,7 +44,7 @@ Base.@ccallable function ccopt_relaxation_create_solver(solver_ptr_ptr::Ptr{Ptr{
             nlp_nt_opts...
                 )
     catch e
-        Base.printstyled("ERROR: "; color=:red, bold=true)
+        Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
         Base.showerror(stdout, e)
         Base.show_backtrace(stdout, Base.catch_backtrace())
         return Cint(-4)
@@ -80,7 +80,7 @@ Base.@ccallable function ccopt_relaxation_solve(solver_ptr::Ptr{Cvoid},
     try
         stats = solve_homotopy!(solver.rnlp, solver, stats; nt_opts...)
     catch e
-        Base.printstyled("ERROR: "; color=:red, bold=true)
+        Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
         Base.showerror(stdout, e)
         Base.show_backtrace(stdout, Base.catch_backtrace())
         status = solver.ipm.status

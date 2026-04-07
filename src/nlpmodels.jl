@@ -51,7 +51,7 @@ Base.@ccallable function libmad_nlpmodel_create(nlp_ptr_ptr::Ptr{Ptr{Cvoid}},
             minimize = true
         )
     catch e
-        Base.printstyled("ERROR: "; color=:red, bold=true)
+        Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
         Base.showerror(stdout, e)
         Base.show_backtrace(stdout, Base.catch_backtrace())
         return Cint(-1)
@@ -71,7 +71,7 @@ Base.@ccallable function libmad_nlpmodel_create(nlp_ptr_ptr::Ptr{Ptr{Cvoid}},
             user_data
         )
     catch e
-        Base.printstyled("ERROR: "; color=:red, bold=true)
+        Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
         Base.showerror(stdout, e)
         Base.show_backtrace(stdout, Base.catch_backtrace())
         return Cint(-2)

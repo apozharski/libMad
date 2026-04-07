@@ -15,7 +15,7 @@ function generate_create_solver(solname, solver_expr, optsdict_expr; model=CNLPM
             nt_opts = try
                 $(Symbol(solname,:_to_parameters))(opts)
             catch e
-                Base.printstyled("ERROR: "; color=:red, bold=true)
+                Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
                 Base.showerror(stdout, e)
                 Base.show_backtrace(stdout, Base.catch_backtrace())
                 return Cint(-1)
@@ -24,7 +24,7 @@ function generate_create_solver(solname, solver_expr, optsdict_expr; model=CNLPM
             nlp = try
                 gpuconvert($(base_solver), opts, nlp)
             catch e
-                Base.printstyled("ERROR: "; color=:red, bold=true)
+                Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
                 Base.showerror(stdout, e)
                 Base.show_backtrace(stdout, Base.catch_backtrace())
                 return Cint(-3)
@@ -34,7 +34,7 @@ function generate_create_solver(solname, solver_expr, optsdict_expr; model=CNLPM
                                nt_opts...
                                    )
             catch e
-                Base.printstyled("ERROR: "; color=:red, bold=true)
+                Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
                 Base.showerror(stdout, e)
                 Base.show_backtrace(stdout, Base.catch_backtrace())
                 return Cint(-3)
@@ -80,7 +80,7 @@ function generate_solve(solname, solver_expr, optsdict_expr, stats_expr)
             stats = try
                 $(stats_expr)(solver)
             catch e
-                Base.printstyled("ERROR: "; color=:red, bold=true)
+                Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
                 Base.showerror(stdout, e)
                 Base.show_backtrace(stdout, Base.catch_backtrace())
                 return Cint(-100)
@@ -89,7 +89,7 @@ function generate_solve(solname, solver_expr, optsdict_expr, stats_expr)
             try
                 stats = SolverCore.solve!(solver, stats; nt_opts...)
             catch e
-                Base.printstyled("ERROR: "; color=:red, bold=true)
+                Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
                 Base.showerror(stdout, e)
                 Base.show_backtrace(stdout, Base.catch_backtrace())
                 status = solver.status
