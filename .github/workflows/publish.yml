@@ -74,12 +74,16 @@ jobs:
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target INSTALL --config Release
     - name: trim out unnecessary artifacts
       run: |
-        function quiet_rm($item)
+        function quiet_rm($items)
         {
-        if (Test-Path $item) {
-          echo "  Removing $item"
-          Remove-Item $item  -r -force
-        }
+          foreach($item in $items)
+          {
+            if (Test-Path $item)
+            {
+              echo "  Removing $item"
+              Remove-Item $item  -r -force
+            }
+          }
         }
         cd build/install/share/julia/artifacts && quiet_rm $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
     - name: tar output
