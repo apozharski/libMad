@@ -1,13 +1,10 @@
-#println(Base.active_project())
 using Pkg
-#println(Pkg.status())
 Pkg.instantiate()
 using libMad
 # TODO(@anton) make this safer
 
 outpath = ARGS[1]
 open(joinpath(outpath,"libMad.h"), "w") do header
-    #println(header,"#include \"julia.h\"")
     # add Guard
     println(header, """
     #ifndef _LIBMAD_H
@@ -26,6 +23,11 @@ open(joinpath(outpath,"libMad.h"), "w") do header
     println(header, """
     #define libmad_int long long int
     #define libmad_real double
+
+    #define LIBMAD_CCOPT_VARVAR 0
+    #define LIBMAD_CCOPT_VARCON 1
+    #define LIBMAD_CCOPT_CONVAR 2
+    #define LIBMAD_CCOPT_CONCON 3
 
     // function pointer types
     typedef int (*NlpConstrJacStructure)(libmad_int*, libmad_int*, void*);

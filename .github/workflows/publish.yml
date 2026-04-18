@@ -14,6 +14,9 @@ jobs:
         julia-version: ['1']
     steps:
     - uses: actions/checkout@v4
+    - uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - uses: julia-actions/install-juliaup@v2
       with:
         channel: ${{ matrix.julia-version }}
@@ -46,6 +49,19 @@ jobs:
         julia-version: ['1']
     steps:
     - uses: actions/checkout@v4
+    - name: Windows SSH Key workarounds # A horrible hack, see https://github.com/webfactory/ssh-agent/issues/148#issuecomment-2602109257
+      shell: bash
+      run: |
+        mkdir -p $HOME/.ssh
+        cat << EOF > $HOME/.ssh/known_hosts
+        github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
+        github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+        EOF
+    - name: Set julia git
+      run: echo "JULIA_PKG_USE_CLI_GIT=true" | Out-File -FilePath $env:GITHUB_ENV -Append
+    - uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - uses: julia-actions/install-juliaup@v2
       with:
         channel: ${{ matrix.julia-version }}
@@ -58,12 +74,16 @@ jobs:
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target INSTALL --config Release
     - name: trim out unnecessary artifacts
       run: |
-        function quiet_rm($item)
+        function quiet_rm($items)
         {
-        if (Test-Path $item) {
-          echo "  Removing $item"
-          Remove-Item $item  -r -force
-        }
+          foreach($item in $items)
+          {
+            if (Test-Path $item)
+            {
+              echo "  Removing $item"
+              Remove-Item $item  -r -force
+            }
+          }
         }
         cd build/install/share/julia/artifacts && quiet_rm $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
     - name: tar output
@@ -87,6 +107,9 @@ jobs:
         julia-version: ['1']
     steps:
     - uses: actions/checkout@v4
+    - uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - uses: julia-actions/install-juliaup@v2
       with:
         channel: ${{ matrix.julia-version }}

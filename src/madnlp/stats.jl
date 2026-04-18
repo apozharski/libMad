@@ -48,5 +48,5 @@ function dual_feas(stats::MadNLPExecutionStats{T}) where T
 end
 
 function status(stats::MadNLPExecutionStats)
-    return Int(stats.status)
+    return Clonglong(stats.status)
 end

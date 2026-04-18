@@ -15,13 +15,14 @@ const PathWithGuards = Tuple{Path, Guards}
 # New interface, using strings and deferring errors to solver creation
 # TODO(@anton) verify lhs is a valid dotstring
 const OptsDict = IdDict{String, ConcreteOption}
+const ConcreteOptsDict = IdDict{String, Any}
 push!(dummy_structs, "OptsDict")
 
-function get_populated_subpaths!(dict::OptsDict, path::Path)
+function get_populated_subpaths!(dict::ConcreteOptsDict, path::Path)
     paths::OptsDict = OptsDict()::OptsDict
     for (key,val) in dict
         if startswith(key, path)
-            push!(paths, (String(chopprefix(key, path)), val))
+            push!(paths, String(chopprefix(key, path*"."))=> val)
             delete!(dict, key)
         end
     end
@@ -165,10 +166,10 @@ function generate_string_to_type_suboptions_checks(path_type_options)
                 if path == $(path) && type == $(tstring)
                     subpath_args = IdDict()
                     for (sk, sv) in subpaths
-                        push!(subpath_args, (Symbol(sk),sv))
+                        push!(subpath_args, Symbol(sk) => sv)
                     end
-                    $(Symbol(tstring,:_suboptions)) = $(type)(;subpath_args)
-                    push!(params, (path, $(Symbol(tstring,:_suboptions))))
+                    $(Symbol(tstring,:_suboptions)) = $(type)(;subpath_args...)
+                    push!(params, path => $(Symbol(tstring,:_suboptions)))
                 end
             end
             push!(checks, check)
@@ -216,7 +217,6 @@ Base.@ccallable function libmad_create_options_dict(opts_ptr_ptr::Ptr{Ptr{Cvoid}
     opts_ptr = Ptr{OptsDict}(pointer_from_objref(opts))
     libmad_refs[opts_ptr] = opts
     unsafe_store!(opts_ptr_ptr, opts_ptr)
-
     return Cint(0)
 end
 
@@ -274,14 +274,22 @@ function generate_guards_check(guards)
 end
 
 function generate_type_check(type)
-    return :(isa(params[path],$(normalize_type(type))) || delete!(params, path))
+    return quote
+        try
+            params[path] = $(normalize_type(type))(params[path])
+        catch
+            delete!(params, path)
+        end
+    end
 end
 
 function generate_drop_check(path, type, guards)
     return quote
         if path == $(path)
             $(generate_guards_check(guards))
-            $(generate_type_check(type))
+            if haskey(params, path)
+                $(generate_type_check(type))
+            end
         end
     end
 end
@@ -311,9 +319,8 @@ function generate_to_parameters(prefix, typedict_expr, valid_paths, path_guards,
     to_params = quote
         function $(Symbol(prefix, :_to_parameters))(opts::OptsDict)#::NamedTuple
             # Takes a dict and walks it to create a flat dict with the proper types
-            params::OptsDict = OptsDict(opts)::OptsDict
+            params = ConcreteOptsDict(opts)
             path_type_options = $(path_type_options)
-
             $(generate_drop_invalid_options(valid_paths, path_guards))
             # Process sub-options structs
             for (path, typedict) in path_type_options
@@ -321,6 +328,9 @@ function generate_to_parameters(prefix, typedict_expr, valid_paths, path_guards,
                 if !haskey(subpaths, "TYPE")
                     # TODO(@anton) warn?
                     #@warn "Missing TYPE for $(path)"
+                    for subpath in keys(subpaths)
+                        delete!(params, path*"."*subpath)
+                    end
                     continue
                 end
                 type = subpaths["TYPE"]

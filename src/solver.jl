@@ -1,6 +1,6 @@
-# TODO (@anton) In the future also handle abstract model types???
+# TODO (@anton) In the future also handle single (or quad!!) precision?
 
-function generate_create_solver(solname, solver_expr, optsdict_expr; model=CNLPModel{Cdouble,Vector{Cdouble}}, modelname="CNLPModel", suffix=Symbol())
+function generate_create_solver(solname, solver_expr, optsdict_expr; model=CNLPModel, modelname="CNLPModel", suffix=Symbol())
 
     base_solver = eval(nameof(eval(solver_expr)))
     push!(function_sigs, "int $(solname)$(suffix)_create_solver($(String(nameof(eval(solver_expr))))** solver_ptr_ptr, $(modelname)* nlp_ptr, OptsDict* opts_ptr)")
@@ -10,15 +10,35 @@ function generate_create_solver(solname, solver_expr, optsdict_expr; model=CNLPM
                                                     nlp_ptr::Ptr{Cvoid},
                                                     opts_ptr::Ptr{Cvoid}
                                                     )::Cint
-            nlp = unsafe_pointer_to_objref(nlp_ptr) # why doesn't this work: nlp = wrap_obj($(model),nlp_ptr)
+            nlp = wrap_obj(Base.RefValue{$(model)},nlp_ptr)[]
             opts = wrap_obj(OptsDict, opts_ptr)
-            nt_opts = $(Symbol(solname,:_to_parameters))(opts)
+            nt_opts = try
+                $(Symbol(solname,:_to_parameters))(opts)
+            catch e
+                Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
+                Base.showerror(stdout, e)
+                Base.show_backtrace(stdout, Base.catch_backtrace())
+                return Cint(-1)
+            end
             # see if we have to wrap the model in in a wrapped model:
-            nlp = gpuconvert($(base_solver), opts, nlp)
-            solver = $(base_solver)(nlp;
-                                    nt_opts...
+            nlp = try
+                gpuconvert($(base_solver), opts, nlp)
+            catch e
+                Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
+                Base.showerror(stdout, e)
+                Base.show_backtrace(stdout, Base.catch_backtrace())
+                return Cint(-3)
+            end
+            solver = try
+                $(base_solver)(nlp;
+                               nt_opts...
                                    )
-
+            catch e
+                Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
+                Base.showerror(stdout, e)
+                Base.show_backtrace(stdout, Base.catch_backtrace())
+                return Cint(-3)
+            end
             solver_ptr = pointer_from_objref(solver)
             unsafe_store!(solver_ptr_ptr, solver_ptr)
             libmad_refs[solver_ptr] = solver
@@ -57,11 +77,21 @@ function generate_solve(solname, solver_expr, optsdict_expr, stats_expr)
             nt_opts = $(Symbol(solname,:_to_parameters))(opts)
             # Prealloc a stats so we always set a stats_ptr even on rethrown error,
             # TODO(@anton): we should maybe call update! anyway? maybe in the solver itself.
-            stats = $(stats_expr)(solver)
+            stats = try
+                $(stats_expr)(solver)
+            catch e
+                Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
+                Base.showerror(stdout, e)
+                Base.show_backtrace(stdout, Base.catch_backtrace())
+                return Cint(-100)
+            end
             status = 0
             try
-                stats = solve!(solver.nlp, solver, stats; nt_opts...)
+                stats = SolverCore.solve!(solver, stats; nt_opts...)
             catch e
+                Base.printstyled("THIS IS A PROBLEM: "; color=:red, bold=true)
+                Base.showerror(stdout, e)
+                Base.show_backtrace(stdout, Base.catch_backtrace())
                 status = solver.status
             finally
                 stats_ptr = pointer_from_objref(stats)

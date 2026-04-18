@@ -15,15 +15,20 @@ function multipliers_U(stats::AbstractExecutionStats) end
 
 function iters(stats::AbstractExecutionStats) end
 
+function total_wall_time(stats::AbstractExecutionStats) end
+
 function primal_feas(stats::AbstractExecutionStats) end
 
 function dual_feas(stats::AbstractExecutionStats) end
+
+function cc_feas(stats::AbstractExecutionStats) end
 
 function status(stats::AbstractExecutionStats) end
 
 function get_n(stats::AbstractExecutionStats) end
 
 function get_m(stats::AbstractExecutionStats) end
+
 
 # macros for defining the stats interfaces
 function generate_stats_getters(solname, stats_expr)
@@ -115,6 +120,15 @@ function generate_stats_getters(solname, stats_expr)
         end
     end
 
+    push!(function_sigs, "int $(solname)_get_total_wall_time($(String(nameof(eval(stats_expr))))* stats_ptr, libmad_real* out)")
+    _total_wall_time = quote
+        Base.@ccallable function $(Symbol(solname, :_get_total_wall_time))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
+            stats = wrap_obj($(stats_expr),stats_ptr)
+            unsafe_store!(out, total_wall_time(stats))
+            return Cint(0)
+        end
+    end
+
     push!(function_sigs, "int $(solname)_get_primal_feas($(String(nameof(eval(stats_expr))))* stats_ptr, libmad_real* out)")
     _primal_feas = quote
         Base.@ccallable function $(Symbol(solname, :_get_primal_feas))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
@@ -152,6 +166,7 @@ function generate_stats_getters(solname, stats_expr)
         $(_bound_multipliers)
         $(_success)
         $(_iters)
+        $(_total_wall_time)
         $(_primal_feas)
         $(_dual_feas)
         $(_status)
@@ -172,12 +187,61 @@ function generate_delete_stats(solname, stats_expr)
     end
 end
 
+function generate_mpcc_stats_getters(solname, stats_expr)
+
+    push!(function_sigs, "int $(solname)_get_cc_feas($(String(nameof(eval(stats_expr))))* stats_ptr, libmad_real* out)")
+    _cc_feas = quote
+        Base.@ccallable function $(Symbol(solname, :_get_cc_feas))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
+            stats = wrap_obj($(stats_expr),stats_ptr)
+            unsafe_store!(out, cc_feas(stats))
+            return Cint(0)
+        end
+    end
+
+    push!(function_sigs, "int $(solname)_get_multipliers_x1($(String(nameof(eval(stats_expr))))* stats_ptr, libmad_real* out)")
+    _multipliers_x1 = quote
+        Base.@ccallable function $(Symbol(solname, :_get_multipliers_x1))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
+            stats = wrap_obj($(stats_expr),stats_ptr)
+            out_arr = wrap_ptr(out, get_ncc(stats))
+            copyto!(out_arr, multipliers_x1(stats))
+            return Cint(0)
+        end
+    end
+    push!(function_sigs, "int $(solname)_get_multipliers_x2($(String(nameof(eval(stats_expr))))* stats_ptr, libmad_real* out)")
+    _multipliers_x2 = quote
+        Base.@ccallable function $(Symbol(solname, :_get_multipliers_x2))(stats_ptr::Ptr{Cvoid}, out::Ptr{Cdouble})::Cint
+            stats = wrap_obj($(stats_expr),stats_ptr)
+            out_arr = wrap_ptr(out, get_ncc(stats))
+            copyto!(out_arr, multipliers_x2(stats))
+            return Cint(0)
+        end
+    end
+
+    return quote
+        $(_cc_feas)
+        $(_multipliers_x1)
+        $(_multipliers_x2)
+    end
+end
+
 macro stats(solname, stats_expr)
     push!(dummy_structs, "$(String(nameof(eval(stats_expr))))")
 
     return esc(
         quote
             $(generate_stats_getters(solname, stats_expr))
+            $(generate_delete_stats(solname, stats_expr))
+        end
+    )
+end
+
+macro mpcc_stats(solname, stats_expr)
+    push!(dummy_structs, "$(String(nameof(eval(stats_expr))))")
+
+    return esc(
+        quote
+            $(generate_stats_getters(solname, stats_expr))
+            $(generate_mpcc_stats_getters(solname, stats_expr))
             $(generate_delete_stats(solname, stats_expr))
         end
     )

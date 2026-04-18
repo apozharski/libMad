@@ -1,101 +1,7 @@
 using MadNLP
 using Base: unsafe_convert
 # Built from MadNLP_c: https://github.com/jgillis/madnlp_c
-nvar::Int64 = 2
-ncon::Int64 = 1
-
-a::Float64 = 1.0
-b::Float64 = 100.0
-
-function _jac_struct(I::Vector{T}, J::Vector{T}) where T
-    I[1] = 1
-    I[2] = 1
-    J[1] = 1
-    J[2] = 2
-end
-
-function _hess_struct(I::Vector{T}, J::Vector{T}) where T
-    I[1] = 1
-    I[2] = 1
-    I[3] = 2
-    J[1] = 1
-    J[2] = 2
-    J[3] = 2
-end
-
-function _eval_f!(w::Vector{T}, f::Vector{T}) where T
-	  f[1] = (a-w[1])^2 + b*(w[2]-w[1]^2)^2
-end
-
-function _eval_g!(w::Vector{T}, g::Vector{T}) where T
-	  g[1] = w[1]^2 + w[2]^2 - 1
-end
-
-function _eval_jac_g!(w::Vector{T}, jac_g::Vector{T}) where T
-    jac_g[1] = 2*w[1]
-    jac_g[2] = 2*w[2]
-end
-
-function _eval_grad_f!(w::Vector{T}, g::Vector{T}) where T
-    g[1] = -4*b*w[1]*(w[2]-w[1]^2)-2*(a-w[1])
-    g[2] = b*2*(w[2]-w[1]^2)
-end
-
-function _eval_h!(w::Vector{T},l::Vector{T}, h::Vector{T}) where T
-    h[1] = (+2 -4*b*w[2] +12*b*w[1]^2)
-    h[2] = (-4*b*w[1])
-    h[3] = (2*b)
-end
-
-function jac_struct(I::Ptr{Clonglong}, J::Ptr{Clonglong}, d::Ptr{Cvoid})::Cint
-    I_::Vector{Int64} = unsafe_wrap(Array, I, 2)
-    J_::Vector{Int64} = unsafe_wrap(Array, J, 2)
-    _jac_struct(I_, J_)
-    return Cint(0)
-end
-
-function hess_struct(I::Ptr{Clonglong}, J::Ptr{Clonglong}, d::Ptr{Cvoid})::Cint
-    I_::Vector{Int64} = unsafe_wrap(Array, I, 3)
-    J_::Vector{Int64} = unsafe_wrap(Array, J, 3)
-    _hess_struct(I_, J_)
-    return Cint(0)
-end
-
-function eval_f(Cw::Ptr{Cdouble},Cf::Ptr{Cdouble}, d::Ptr{Cvoid})::Cint
-    w::Vector{Float64} = unsafe_wrap(Array, Cw, nvar)
-    f::Vector{Float64} = unsafe_wrap(Array, Cf, 1)
-    _eval_f!(w,f)
-    return Cint(0)
-end
-
-function eval_g(w::Ptr{Cdouble},Ccons::Ptr{Cdouble}, d::Ptr{Cvoid})::Cint
-    w::Vector{Float64} = unsafe_wrap(Array, w, nvar)
-    cons::Vector{Float64} = unsafe_wrap(Array, Ccons, ncon)
-    _eval_g!(w,cons)
-    return Cint(0)
-end
-
-function eval_grad_f(Cw::Ptr{Cdouble},Cgrad::Ptr{Cdouble}, d::Ptr{Cvoid})::Cint
-    w::Vector{Float64} = unsafe_wrap(Array, Cw, nvar)
-    grad::Vector{Float64} = unsafe_wrap(Array, Cgrad, 2)
-    _eval_grad_f!(w,grad)
-    return Cint(0)
-end
-
-function eval_jac_g(w::Ptr{Cdouble}, Cjac_q::Ptr{Cdouble}, d::Ptr{Cvoid})::Cint
-    w::Vector{Float64} = unsafe_wrap(Array, w, nvar)
-    jac_g::Vector{Float64} = unsafe_wrap(Array, Cjac_q, 2)
-    _eval_jac_g!(w,jac_g)
-    return Cint(0)
-end
-
-function eval_h(obj_scale::Cdouble, Cw::Ptr{Cdouble}, Cl::Ptr{Cdouble}, Chess::Ptr{Cdouble}, d::Ptr{Cvoid})::Cint
-    w::Vector{Float64} = unsafe_wrap(Array, Cw, nvar)
-    l::Vector{Float64} = unsafe_wrap(Array, Cl, ncon)
-    hess::Vector{Float64} = unsafe_wrap(Array, Chess, 3)
-    _eval_h!(w,l,hess)
-    return Cint(0)
-end
+ncc::Int64 = 1
 
 @setup_workload begin
     c_jac_struct = @cfunction(jac_struct, Cint, (Ptr{Clonglong}, Ptr{Clonglong}, Ptr{Cvoid}))
@@ -110,9 +16,15 @@ end
     opts_ptr_vec = Vector{Ptr{Cvoid}}([C_NULL])
     opts_ptr = opts_ptr_vec[1]
     opts_ptr_ptr = pointer(opts_ptr_vec)
+    mpcc_opts_ptr_vec = Vector{Ptr{Cvoid}}([C_NULL])
+    mpcc_opts_ptr = mpcc_opts_ptr_vec[1]
+    mpcc_opts_ptr_ptr = pointer(mpcc_opts_ptr_vec)
     nlp_ptr_vec = Vector{Ptr{Cvoid}}([C_NULL])
     nlp_ptr = nlp_ptr_vec[1]
     nlp_ptr_ptr = pointer(nlp_ptr_vec)
+    mpcc_ptr_vec = Vector{Ptr{Cvoid}}([C_NULL])
+    mpcc_ptr = mpcc_ptr_vec[1]
+    mpcc_ptr_ptr = pointer(mpcc_ptr_vec)
     solver_ptr_vec = Vector{Ptr{Cvoid}}([C_NULL])
     solver_ptr = solver_ptr_vec[1]
     solver_ptr_ptr = pointer(solver_ptr_vec)
@@ -127,19 +39,20 @@ end
     o_multipliers_U = Vector{Cdouble}(undef, 2)
     o_constraints = Vector{Cdouble}(undef, 1)
     o_multipliers = Vector{Cdouble}(undef, 1)
+    o_multipliers_x1 = Vector{Cdouble}(undef, 1)
+    o_multipliers_x2 = Vector{Cdouble}(undef, 1)
 
     x0 = Vector{Cdouble}([1.0, 1.0])
 
-    lvar = Vector{Cdouble}([-Inf, -Inf])
+    lvar = Vector{Cdouble}([0, 0])
     uvar = Vector{Cdouble}([Inf, Inf])
     lcon = Vector{Cdouble}([0.0])
     ucon = Vector{Cdouble}([0.0])
+    ind_cc1 = Vector{Clonglong}([1])
+    ind_cc2 = Vector{Clonglong}([2])
+    cctypes = Vector{Clonglong}([0])
     # until we figure out a workaround for HSL we cannot precompile those solvers
-    @static if !Sys.isapple()
-        linear_solvers = ["CHOLMODSolver", "LapackCPUSolver", "LDLSolver", "MumpsSolver", "UmfpackSolver", "CUDSSSolver"]
-    else
-        linear_solvers = ["CHOLMODSolver", "LapackCPUSolver", "LDLSolver", "MumpsSolver", "UmfpackSolver"]
-    end
+    linear_solvers = ["CHOLMODSolver", "LapackCPUSolver", "LDLSolver", "MumpsSolver", "UmfpackSolver"]
     for ls in linear_solvers
         for kkt in keys(KKT_DICT)
             println("kkt: $(kkt), linear solver: $(ls)")
@@ -163,10 +76,18 @@ end
                                                            pointer(lvar), pointer(uvar),
                                                            pointer(lcon), pointer(ucon)
                                                            )
-
                         nlp_ptr = nlp_ptr_vec[1]
+                        libMad.libmad_mpccmodel_create(mpcc_ptr_ptr,
+                                                       nlp_ptr,
+                                                       ncc,
+                                                       pointer(ind_cc1), pointer(ind_cc2),
+                                                       pointer(cctypes)
+                                                       )
+                        mpcc_ptr = mpcc_ptr_vec[1]
                         libMad.libmad_create_options_dict(opts_ptr_ptr)
                         opts_ptr = opts_ptr_vec[1]
+                        libMad.libmad_create_options_dict(mpcc_opts_ptr_ptr)
+                        mpcc_opts_ptr = mpcc_opts_ptr_vec[1]
 
                         _tol = "tol"
                         _max_iter = "max_iter"
@@ -175,28 +96,27 @@ end
                         _linear_solver = "linear_solver"
                         _SparseCallback = "SparseCallback"
                         _hessian_constant = "hessian_constant"
-                        _barrier_type = "barrier.TYPE"
-                        _monotone = "MonotoneUpdateRule"
                         libMad.libmad_set_double_option(opts_ptr, unsafe_convert(Cstring,_tol), Cdouble(1e-6))
                         libMad.libmad_set_int64_option(opts_ptr, unsafe_convert(Cstring,_max_iter), 2000)
                         libMad.libmad_set_string_option(opts_ptr, unsafe_convert(Cstring,_callback), unsafe_convert(Cstring,_SparseCallback))
-                        libMad.libmad_set_string_option(opts_ptr, unsafe_convert(Cstring,_barrier_type), unsafe_convert(Cstring,_monotone))
                         libMad.libmad_set_int64_option(opts_ptr, unsafe_convert(Cstring,_print_level), Clonglong(MadNLP.ERROR))
                         libMad.libmad_set_string_option(opts_ptr, unsafe_convert(Cstring,_linear_solver), unsafe_convert(Cstring,ls))
                         libMad.libmad_set_bool_option(opts_ptr, unsafe_convert(Cstring,_hessian_constant), false)
 
-                        libMad.madnlp_create_solver(solver_ptr_ptr, nlp_ptr, opts_ptr)
+                        libMad.ccopt_relaxation_create_solver(solver_ptr_ptr, mpcc_ptr, opts_ptr, mpcc_opts_ptr)
                         solver_ptr = solver_ptr_vec[1]
-                        libMad.madnlp_solve(solver_ptr, opts_ptr, stats_ptr_ptr)
+                        libMad.ccopt_relaxation_solve(solver_ptr, opts_ptr, stats_ptr_ptr)
                         stats_ptr = stats_ptr_vec[1]
 
-                        libMad.madnlp_get_success(stats_ptr, pointer(o_success))
-                        libMad.madnlp_get_obj(stats_ptr, pointer(o_obj))
-                        libMad.madnlp_get_solution(stats_ptr, pointer(o_solution))
-                        libMad.madnlp_get_multipliers(stats_ptr, pointer(o_multipliers))
-                        libMad.madnlp_get_constraints(stats_ptr, pointer(o_constraints))
-                        libMad.madnlp_get_multipliers_L(stats_ptr, pointer(o_multipliers_L))
-                        libMad.madnlp_get_multipliers_U(stats_ptr, pointer(o_multipliers_U))
+                        libMad.ccopt_relaxation_get_success(stats_ptr, pointer(o_success))
+                        libMad.ccopt_relaxation_get_obj(stats_ptr, pointer(o_obj))
+                        libMad.ccopt_relaxation_get_solution(stats_ptr, pointer(o_solution))
+                        libMad.ccopt_relaxation_get_multipliers(stats_ptr, pointer(o_multipliers))
+                        libMad.ccopt_relaxation_get_constraints(stats_ptr, pointer(o_constraints))
+                        libMad.ccopt_relaxation_get_multipliers_L(stats_ptr, pointer(o_multipliers_L))
+                        libMad.ccopt_relaxation_get_multipliers_U(stats_ptr, pointer(o_multipliers_U))
+                        libMad.ccopt_relaxation_get_multipliers_x1(stats_ptr, pointer(o_multipliers_x1))
+                        libMad.ccopt_relaxation_get_multipliers_x2(stats_ptr, pointer(o_multipliers_x2))
 
                         println("success: $(o_success)")
                         println("obj: $(o_obj)")
@@ -205,11 +125,13 @@ end
                         println("constraints: $(o_constraints)")
                         println("multipliers_U: $(o_multipliers_U)")
                         println("multipliers_L: $(o_multipliers_L)")
+                        println("multipliers_x2: $(o_multipliers_x1)")
+                        println("multipliers_x2: $(o_multipliers_x2)")
 
-                        libMad.madnlp_delete_solver(solver_ptr)
+                        libMad.ccopt_relaxation_delete_solver(solver_ptr)
                     catch e
                         Base.printstyled("WARN: "; color=:red, bold=true)
-                        #Base.showerror(stdout, e)
+                        Base.showerror(stdout, e)
                         Base.show_backtrace(stdout, Base.catch_backtrace())
                         println("$((ls, kkt)) failed")
                     finally

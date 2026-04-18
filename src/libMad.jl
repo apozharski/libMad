@@ -9,8 +9,11 @@ using NLPModels
 using PrecompileTools: @setup_workload, @compile_workload, verbose
 using Base: unsafe_convert
 using SolverCore
-using CUDA
-using MadNLPGPU
+@static if !Sys.isapple()
+    using CUDA
+    using CUDSS
+    using MadNLPGPU
+end
 
 # Store of references to libMad objects, to prevent garbage collection.
 libmad_refs::Dict{Ptr, Any} = Dict{Ptr, Any}()
@@ -53,7 +56,9 @@ const madnlp_type_dict = Dict(
 )
 
 include("madnlp/stats.jl")
-include("madnlp/gpu.jl")
+@static if !Sys.isapple()
+    include("madnlp/gpu.jl")
+end
 
 @opts(madnlp, MadNLPOptions{Cdouble}, libMad.madnlp_type_dict)
 
@@ -66,4 +71,22 @@ include("madnlp/gpu.jl")
 # Precompile workload for madnlp
 include("madnlp/workload_precomp.jl")
 
+# 
+using CCOpt
+using CCOpt: MPCCModel, MPCCModelVarVar, IndexSet, CCOptExecutionStats, RelaxationOptions, RelaxationSolver, solve_homotopy!
+include("mpccmodels.jl")
+include("ccopt/stats.jl")
+
+@concrete_dict RLX_DICT CCOpt.AbstractMPCCRelaxation
+
+@mpcc_stats(ccopt_relaxation, CCOptExecutionStats)
+const ccopt_relaxation_type_dict = Dict(
+    "relaxation" => RLX_DICT
+)
+@opts(ccopt_relaxation, RelaxationOptions{Cdouble}, libMad.ccopt_relaxation_type_dict)
+
+include("ccopt/solver.jl")
+
+# Precompile workload for madnlp
+include("ccopt/workload_precomp.jl")
 end # module libMad
