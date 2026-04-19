@@ -52,7 +52,7 @@ function iters(stats::CCOptExecutionStats)
 end
 
 function total_wall_time(stats::CCOptExecutionStats)
-    return stats.counters.counters.total_time
+    return stats.counters.total_time
 end
 
 function primal_feas(stats::CCOptExecutionStats{T}) where T
