@@ -187,7 +187,7 @@ end
 
                         ret = libMad.madnlp_create_solver(solver_ptr_ptr, nlp_ptr, opts_ptr)
                         solver_ptr = solver_ptr_vec[1]
-                        (ret == 0) & (ret = libMad.madnlp_solve(solver_ptr, opts_ptr, stats_ptr_ptr))
+                        (ret == 0) && (ret = libMad.madnlp_solve(solver_ptr, opts_ptr, stats_ptr_ptr))
                         stats_ptr = stats_ptr_vec[1]
 
                         (ret == 0) && (ret = libMad.madnlp_get_success(stats_ptr, pointer(o_success)))
