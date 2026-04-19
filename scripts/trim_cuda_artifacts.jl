@@ -16,7 +16,7 @@ for pkg in pkgs
     for art_name in art_names
         hash = Artifacts.artifact_hash(art_name, art)
         if hash !== nothing # because windows is bad
-            println(hash)
+            println(bytes2hex(hash.bytes)*"/*")
         end
     end
 end
