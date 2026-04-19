@@ -185,28 +185,32 @@ end
                         libMad.libmad_set_string_option(opts_ptr, unsafe_convert(Cstring,_linear_solver), unsafe_convert(Cstring,ls))
                         libMad.libmad_set_bool_option(opts_ptr, unsafe_convert(Cstring,_hessian_constant), false)
 
-                        libMad.madnlp_create_solver(solver_ptr_ptr, nlp_ptr, opts_ptr)
+                        ret = libMad.madnlp_create_solver(solver_ptr_ptr, nlp_ptr, opts_ptr)
                         solver_ptr = solver_ptr_vec[1]
-                        libMad.madnlp_solve(solver_ptr, opts_ptr, stats_ptr_ptr)
+                        (ret == 0) & (ret = libMad.madnlp_solve(solver_ptr, opts_ptr, stats_ptr_ptr))
                         stats_ptr = stats_ptr_vec[1]
 
-                        libMad.madnlp_get_success(stats_ptr, pointer(o_success))
-                        libMad.madnlp_get_obj(stats_ptr, pointer(o_obj))
-                        libMad.madnlp_get_solution(stats_ptr, pointer(o_solution))
-                        libMad.madnlp_get_multipliers(stats_ptr, pointer(o_multipliers))
-                        libMad.madnlp_get_constraints(stats_ptr, pointer(o_constraints))
-                        libMad.madnlp_get_multipliers_L(stats_ptr, pointer(o_multipliers_L))
-                        libMad.madnlp_get_multipliers_U(stats_ptr, pointer(o_multipliers_U))
+                        (ret == 0) && (ret = libMad.madnlp_get_success(stats_ptr, pointer(o_success)))
+                        (ret == 0) && (ret = libMad.madnlp_get_obj(stats_ptr, pointer(o_obj)))
+                        (ret == 0) && (ret = libMad.madnlp_get_solution(stats_ptr, pointer(o_solution)))
+                        (ret == 0) && (ret = libMad.madnlp_get_multipliers(stats_ptr, pointer(o_multipliers)))
+                        (ret == 0) && (ret = libMad.madnlp_get_constraints(stats_ptr, pointer(o_constraints)))
+                        (ret == 0) && (ret = libMad.madnlp_get_multipliers_L(stats_ptr, pointer(o_multipliers_L)))
+                        (ret == 0) && (ret = libMad.madnlp_get_multipliers_U(stats_ptr, pointer(o_multipliers_U)))
 
-                        println("success: $(o_success)")
-                        println("obj: $(o_obj)")
-                        println("solution: $(o_solution)")
-                        println("multipliers: $(o_multipliers)")
-                        println("constraints: $(o_constraints)")
-                        println("multipliers_U: $(o_multipliers_U)")
-                        println("multipliers_L: $(o_multipliers_L)")
+                        if ret == 0
+                            println("success: $(o_success)")
+                            println("obj: $(o_obj)")
+                            println("solution: $(o_solution)")
+                            println("multipliers: $(o_multipliers)")
+                            println("constraints: $(o_constraints)")
+                            println("multipliers_U: $(o_multipliers_U)")
+                            println("multipliers_L: $(o_multipliers_L)")
 
-                        libMad.madnlp_delete_solver(solver_ptr)
+                            libMad.madnlp_delete_solver(solver_ptr)
+                        else
+                            println("Solver failed in precompile workload with $(ret)")
+                        end
                     catch e
                         Base.printstyled("WARN: "; color=:red, bold=true)
                         #Base.showerror(stdout, e)

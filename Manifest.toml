@@ -438,8 +438,8 @@ version = "0.9.1"
 
 [[deps.MadNLPGPU]]
 deps = ["AMD", "Adapt", "GPUArraysCore", "KernelAbstractions", "LinearAlgebra", "MadNLP", "Metis", "SparseArrays"]
-git-tree-sha1 = "563b7e59d455b88c9b9978d0756de52ad6d4f52b"
-repo-rev = "684dbe1"
+git-tree-sha1 = "b511e26f9c75b7eb5f0192b1300b6987989f4deb"
+repo-rev = "7fed853"
 repo-subdir = "lib/MadNLPGPU"
 repo-url = "https://github.com/MadNLP/MadNLP.jl.git"
 uuid = "d72a61cc-809d-412f-99be-fd81f4b8a598"
@@ -457,7 +457,7 @@ version = "0.8.0"
 [[deps.MadNLPHSL]]
 deps = ["HSL", "LinearAlgebra", "MadNLP"]
 git-tree-sha1 = "b3c4560554a05efca7f651ac783c8ff532c0b1be"
-repo-rev = "684dbe1"
+repo-rev = "7fed853"
 repo-subdir = "lib/MadNLPHSL"
 repo-url = "https://github.com/MadNLP/MadNLP.jl.git"
 uuid = "7fb6135f-58fe-4112-84ca-653cf5be0c77"
