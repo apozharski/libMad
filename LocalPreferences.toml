@@ -6,4 +6,4 @@ local = "true"
 version = "13.0"
 
 [CUDA]
-local_compiler = "false"
+local_compiler = "true"
