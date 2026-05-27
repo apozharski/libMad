@@ -63,6 +63,9 @@ jobs:
     - name: Add interface lib file for MSVC
       run: |
         cd build/install
+        if (!(Test-Path lib)){
+          mkdir lib
+        }
         cp bin/libMad.imp.lib lib/Mad.lib
     - name: trim out unnecessary artifacts
       run: |
