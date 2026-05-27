@@ -60,6 +60,10 @@ jobs:
       shell: pwsh
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target INSTALL --config Release
+    - name: Add interface lib file for MSVC
+      run: |
+        cd build/install
+        cp bin/libMad.imp.lib lib/Mad.lib
     - name: trim out unnecessary artifacts
       run: |
         function quiet_rm($items)
