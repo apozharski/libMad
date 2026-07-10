@@ -114,7 +114,10 @@ else()
   message(${JULIAC_EXECUTABLE})
 endif()
 
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/include")
+# setup dirs for vscode build. what a pain.
+file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/include")
+file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/share")
 
 # SETUP VARIABLES BECAUSE WINDOWS IS HORRIBLE:
 if(LINUX OR APPLE)
