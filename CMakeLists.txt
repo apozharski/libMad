@@ -192,7 +192,8 @@ endif()
 # SETUP THE BUILD
 add_custom_command(
   OUTPUT ${LIBMAD_JULIAC_OUTPUTS}
-  COMMAND ${JULIAC_EXECUTABLE} --verbose --compile-ccallable --include-preferences --bundle ${PROJECT_BINARY_DIR} --experimental ${JULIAC_FLAGS} --output-lib libMad ${PROJECT_SOURCE_DIR}
+  COMMAND ${JULIAC_EXECUTABLE} --verbose --compile-ccallable --bundle ${PROJECT_BINARY_DIR} --experimental ${JULIAC_FLAGS} --output-lib libMad ${PROJECT_SOURCE_DIR}
+  #COMMAND ${JULIAC_EXECUTABLE} --verbose --compile-ccallable --include-preferences --bundle ${PROJECT_BINARY_DIR} --experimental ${JULIAC_FLAGS} --output-lib libMad ${PROJECT_SOURCE_DIR}
   DEPENDS ${LIBMAD_SHARED_LIBRARY_DEPENDENCIES}
 )
 
