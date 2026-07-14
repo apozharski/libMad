@@ -290,6 +290,14 @@ install(
   DESTINATION "."
 )
 
+if(WIN32)
+  install(
+  FILES
+    ${LIBMAD_IMPLIB}
+  DESTINATION
+    bin
+  )
+endif()
 if(WITH_EXAMPLE)
   install(TARGETS basic_problem
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

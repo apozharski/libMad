@@ -66,8 +66,7 @@ jobs:
         if (!(Test-Path lib)){
           mkdir lib
         }
-        cp libMad.dll.a lib/Mad.lib
-        cp libMad.dll.a bin/libmMad.dll.a
+        cp bin/libMad.dll.a lib/Mad.lib
     - name: trim out unnecessary artifacts
       run: |
         function quiet_rm($items)
