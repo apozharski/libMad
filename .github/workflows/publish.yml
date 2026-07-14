@@ -22,7 +22,7 @@ jobs:
         channel: ${{ matrix.julia-version }}
     # Get a patched version of JuliaC
     - name: install JuliaC
-      run: julia -e 'using Pkg; Pkg.add(url="https://github.com/apozharski/JuliaC.jl.git"); Pkg.Apps.add(url="https://github.com/apozharski/JuliaC.jl.git")'
+      run: julia -e 'using Pkg; Pkg.add(name="JuliaC", version="0.3.8"); Pkg.Apps.add(name="JuliaC", version="0.3.8")'
     - name: add JuliaC to path
       run: echo "$HOME/.julia/bin" >> "$GITHUB_PATH"
     - name: build libMad
@@ -66,7 +66,7 @@ jobs:
       with:
         channel: ${{ matrix.julia-version }}
     - name: install JuliaC
-      run: julia -e 'using Pkg; Pkg.add(url="https://github.com/apozharski/JuliaC.jl.git"); Pkg.Apps.add(url="https://github.com/apozharski/JuliaC.jl.git")'
+      run: julia -e 'using Pkg; Pkg.add(name="JuliaC", version="0.3.8"); Pkg.Apps.add(name="JuliaC", version="0.3.8")'
     - name: add JuliaC to path
       run: echo "PATH=$HOME\.julia\bin;$env:PATH" >> $env:GITHUB_ENV
       shell: pwsh
@@ -78,7 +78,7 @@ jobs:
         if (!(Test-Path lib)){
           mkdir lib
         }
-        cp bin/libMad.imp.lib lib/Mad.lib
+        cp bin/libMad.dll.a lib/Mad.lib
     - name: trim out unnecessary artifacts
       run: |
         function quiet_rm($items)
@@ -121,7 +121,7 @@ jobs:
       with:
         channel: ${{ matrix.julia-version }}
     - name: install JuliaC
-      run: julia -e 'using Pkg; Pkg.add(url="https://github.com/apozharski/JuliaC.jl.git"); Pkg.Apps.add(url="https://github.com/apozharski/JuliaC.jl.git")'
+      run: julia -e 'using Pkg; Pkg.add(name="JuliaC", version="0.3.8"); Pkg.Apps.add(name="JuliaC", version="0.3.8")'
     - name: add JuliaC to path
       run: echo "$HOME/.julia/bin" >> "$GITHUB_PATH"
     - name: build libMad
