@@ -130,7 +130,7 @@ elseif(WIN32)
   set(LIBMAD_SHARED_LIBRARY_PATH ${PROJECT_BINARY_DIR}/bin)
   set(LIBMAD_BIN_PATH ${PROJECT_BINARY_DIR}/bin)
 endif()
-set(LIBMAD_IMPLIB ${PROJECT_BINARY_DIR}/bin/libMad.dll.a)
+set(LIBMAD_IMPLIB ${PROJECT_BINARY_DIR}/libMad.dll.a) # JuliaC dumps this in the root of the build instead of in bin with the actual library...
 set(LIBMAD_HEADER ${PROJECT_BINARY_DIR}/include/libMad.h)
 set(LIBMAD_HEADER_PATH ${PROJECT_BINARY_DIR}/include)
 set(LIBMAD_BUNDLE_PATH ${PROJECT_BINARY_DIR}/share)
