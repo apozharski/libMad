@@ -4,6 +4,8 @@ on:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
       - "v[0-9]+.[0-9]+.[0-9]+-*"
+env:
+  JULIA_CPU_TARGET: "generic"
 jobs:
   build_linux:
     name: Build binaries - ubuntu-latest
