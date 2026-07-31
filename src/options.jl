@@ -74,6 +74,14 @@ function normalize_type(type::Type)
     end
 end
 
+function normalize_Type(type::Type)
+    if type <: Type
+        return String
+    else
+        return type
+    end
+end
+
 function normalize_typename(type::Type)
     return String(nameof(type))
 end
@@ -276,7 +284,7 @@ end
 function generate_type_check(type)
     return quote
         try
-            params[path] = $(normalize_type(type))(params[path])
+            params[path] = $(normalize_Type(type))(params[path])
         catch
             delete!(params, path)
         end
