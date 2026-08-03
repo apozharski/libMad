@@ -42,8 +42,8 @@ jobs:
         julia-version: ['1.12']
     steps:
     - uses: actions/checkout@v4
-      shell: bash
     - name: Windows SSH Key workarounds # A horrible hack, see https://github.com/webfactory/ssh-agent/issues/148#issuecomment-2602109257
+      shell: bash
       run: |
         mkdir -p $HOME/.ssh
         cat << EOF > $HOME/.ssh/known_hosts
