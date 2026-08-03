@@ -1,0 +1,92 @@
+diff --git a/Project.toml b/Project.toml
+index 335c52f..8d60002 100644
+--- a/Project.toml
++++ b/Project.toml
+@@ -6,17 +6,10 @@ authors = ["Anton Edvinovich Pozharskiy <anton.pozharskiy@imtek.uni-freiburg.de>
+ [deps]
+ BFloat16s = "ab4f0b2a-ad5b-11e8-123f-65d77653426b"
+ CCOpt = "6689419a-93c1-455a-8ac6-77991ec4f86b"
+-CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+-CUDA_Driver_jll = "4ee394cb-3365-5eb0-8335-949819d2adfc"
+-CUDA_Runtime_Discovery = "1af6417a-86b4-443c-805f-a4643ffb695f"
+-CUDA_Runtime_jll = "76a88914-d11a-5bdc-97e0-2f5a05c973a2"
+-CUDSS = "45b445bb-4962-46a0-9369-b4df9d0f772e"
+-GPUCompiler = "61eb1bfa-7361-4325-ad38-22787b887f55"
+ HSL = "34c5aeac-e683-54a6-a0e9-6e0fdc586c50"
+ InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+ Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+ MadNLP = "2621e9c9-9eb4-46b1-8089-e8c72242dfb6"
+-MadNLPGPU = "d72a61cc-809d-412f-99be-fd81f4b8a598"
+ MadNLPHSL = "7fb6135f-58fe-4112-84ca-653cf5be0c77"
+ NLPModels = "a4795742-8479-5a88-8948-cc11e1c8c1a6"
+ PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
+@@ -26,17 +19,10 @@ SolverCore = "ff4d7338-4cf1-434d-91df-b86cb86fb843"
+ [compat]
+ BFloat16s = "0.6.1"
+ CCOpt = "0.1.0"
+-CUDA = "6.2"
+-CUDA_Driver_jll = "13.2.0"
+-CUDA_Runtime_Discovery = "2.1.0"
+-CUDA_Runtime_jll = "0.21.0, 0.22.0, 0.23.0"
+-CUDSS = "0.7"
+-GPUCompiler = "1.7.5"
+ HSL = "0.5.2"
+ InteractiveUtils = "1.11.0"
+ Libdl = "1.11.0"
+ MadNLP = "0.10.1"
+-MadNLPGPU = "0.10.1"
+ MadNLPHSL = "0.7.2"
+ NLPModels = "0.21.5"
+ PrecompileTools = "1.3.2"
+diff --git a/src/libMad.jl b/src/libMad.jl
+index 43a4bad..d659304 100644
+--- a/src/libMad.jl
++++ b/src/libMad.jl
+@@ -9,11 +9,6 @@ using NLPModels
+ using PrecompileTools: @setup_workload, @compile_workload, verbose
+ using Base: unsafe_convert
+ using SolverCore
+-@static if !Sys.isapple()
+-    using CUDA
+-    using CUDSS
+-    using MadNLPGPU
+-end
+ 
+ # Store of references to libMad objects, to prevent garbage collection.
+ libmad_refs::Dict{Ptr, Any} = Dict{Ptr, Any}()
+@@ -56,9 +51,6 @@ const madnlp_type_dict = Dict(
+ )
+ 
+ include("madnlp/stats.jl")
+-@static if !Sys.isapple()
+-    include("madnlp/gpu.jl")
+-end
+ 
+ @opts(madnlp, MadNLPOptions{Cdouble}, libMad.madnlp_type_dict)
+ 
+@@ -71,7 +63,7 @@ end
+ # Precompile workload for madnlp
+ include("madnlp/workload_precomp.jl")
+ 
+-# 
++#
+ using CCOpt
+ using CCOpt: MPCCModel, MPCCModelVarVar, IndexSet, CCOptExecutionStats, RelaxationOptions, RelaxationSolver, solve_homotopy!
+ include("mpccmodels.jl")
+diff --git a/src/madnlp/workload_precomp.jl b/src/madnlp/workload_precomp.jl
+index d56189e..4a44e11 100644
+--- a/src/madnlp/workload_precomp.jl
++++ b/src/madnlp/workload_precomp.jl
+@@ -135,11 +135,7 @@ end
+     lcon = Vector{Cdouble}([0.0])
+     ucon = Vector{Cdouble}([0.0])
+     # until we figure out a workaround for HSL we cannot precompile those solvers
+-    @static if !Sys.isapple()
+-        linear_solvers = ["CHOLMODSolver", "LapackCPUSolver", "LDLSolver", "MumpsSolver", "UmfpackSolver", "CUDSSSolver"]
+-    else
+-        linear_solvers = ["CHOLMODSolver", "LapackCPUSolver", "LDLSolver", "MumpsSolver", "UmfpackSolver"]
+-    end
++    linear_solvers = ["CHOLMODSolver", "LapackCPUSolver", "LDLSolver", "MumpsSolver", "UmfpackSolver", "CUDSSSolver"]
+     for ls in linear_solvers
+         for kkt in keys(KKT_DICT)
+             println("kkt: $(kkt), linear solver: $(ls)")
