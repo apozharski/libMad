@@ -1,7 +1,6 @@
-name: build
+name: build - cuda
 on:
   workflow_dispatch:
-  pull_request:
 env:
   JULIA_CPU_TARGET: "generic"
 jobs:
@@ -20,9 +19,6 @@ jobs:
     - uses: julia-actions/install-juliaup@v2
       with:
         channel: ${{ matrix.julia-version }}
-    - name: Patch out GPU support
-      shell: bash
-      run: git apply no_gpu_patches/no_gpu.patch
     # Get a patched version of JuliaC
     - name: install JuliaC
       run: julia -e 'using Pkg; Pkg.add(name="JuliaC", version="0.3.8"); Pkg.Apps.add(name="JuliaC", version="0.3.8")'
@@ -58,9 +54,6 @@ jobs:
     - uses: julia-actions/install-juliaup@v2
       with:
         channel: ${{ matrix.julia-version }}
-    - name: Patch out GPU support
-      shell: bash
-      run: git apply no_gpu_patches/no_gpu.patch
     - name: install JuliaC
       run: julia -e 'using Pkg; Pkg.add(name="JuliaC", version="0.3.8"); Pkg.Apps.add(name="JuliaC", version="0.3.8")'
     - name: add JuliaC to path
@@ -75,28 +68,17 @@ jobs:
           mkdir lib
         }
         cp bin/libMad.dll.a lib/Mad.lib
-
-  build_apple:
-    name: Build binaries - mac-latest
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        julia-version: ['1.12']
-    steps:
-    - uses: actions/checkout@v4
-    - uses: webfactory/ssh-agent@v0.9.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-    - uses: julia-actions/install-juliaup@v2
-      with:
-        channel: ${{ matrix.julia-version }}
-    - name: Patch out GPU support
-      shell: bash
-      run: git apply no_gpu_patches/no_gpu.patch
-    - name: install JuliaC
-      run: julia -e 'using Pkg; Pkg.add(name="JuliaC", version="0.3.8"); Pkg.Apps.add(name="JuliaC", version="0.3.8")'
-    - name: add JuliaC to path
-      run: echo "$HOME/.julia/bin" >> "$GITHUB_PATH"
-    - name: build libMad
-      run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
+    - name: trim out unnecessary artifacts
+      run: |
+        function quiet_rm($items)
+        {
+          foreach($item in $items)
+          {
+            if (Test-Path $item)
+            {
+              echo "  Removing $item"
+              Remove-Item $item  -r -force
+            }
+          }
+        }
+        cd build/install/share/julia/artifacts && quiet_rm $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)

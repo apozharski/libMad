@@ -1,7 +1,9 @@
-name: build
+name: publish - cuda
 on:
-  workflow_dispatch:
-  pull_request:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
 env:
   JULIA_CPU_TARGET: "generic"
 jobs:
@@ -11,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        julia-version: ['1.12']
+        julia-version: ['1']
     steps:
     - uses: actions/checkout@v4
     - uses: webfactory/ssh-agent@v0.9.0
@@ -20,9 +22,6 @@ jobs:
     - uses: julia-actions/install-juliaup@v2
       with:
         channel: ${{ matrix.julia-version }}
-    - name: Patch out GPU support
-      shell: bash
-      run: git apply no_gpu_patches/no_gpu.patch
     # Get a patched version of JuliaC
     - name: install JuliaC
       run: julia -e 'using Pkg; Pkg.add(name="JuliaC", version="0.3.8"); Pkg.Apps.add(name="JuliaC", version="0.3.8")'
@@ -32,6 +31,16 @@ jobs:
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
     - name: trim out unnecessary artifacts
       run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
+    - name: tar output
+      run: cd build/install && tar -czf ../../libMad-ubuntu-x86_64-${{ github.ref_name }}.tar.gz *
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: libMad-ubuntu-x86_64-${{ github.ref_name }}-cuda.tar.gz
+        asset_name: libMad-ubuntu-x86_64-${{ github.ref_name }}-cuda.tar.gz
+        tag: ${{ github.ref }}
+        body: "Release ${{ github.ref_name }}"
 
   build_windows:
     name: Build binaries - windows-latest
@@ -39,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        julia-version: ['1.12']
+        julia-version: ['1']
     steps:
     - uses: actions/checkout@v4
     - name: Windows SSH Key workarounds # A horrible hack, see https://github.com/webfactory/ssh-agent/issues/148#issuecomment-2602109257
@@ -58,9 +67,6 @@ jobs:
     - uses: julia-actions/install-juliaup@v2
       with:
         channel: ${{ matrix.julia-version }}
-    - name: Patch out GPU support
-      shell: bash
-      run: git apply no_gpu_patches/no_gpu.patch
     - name: install JuliaC
       run: julia -e 'using Pkg; Pkg.add(name="JuliaC", version="0.3.8"); Pkg.Apps.add(name="JuliaC", version="0.3.8")'
     - name: add JuliaC to path
@@ -75,28 +81,28 @@ jobs:
           mkdir lib
         }
         cp bin/libMad.dll.a lib/Mad.lib
-
-  build_apple:
-    name: Build binaries - mac-latest
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        julia-version: ['1.12']
-    steps:
-    - uses: actions/checkout@v4
-    - uses: webfactory/ssh-agent@v0.9.0
+    - name: trim out unnecessary artifacts
+      run: |
+        function quiet_rm($items)
+        {
+          foreach($item in $items)
+          {
+            if (Test-Path $item)
+            {
+              echo "  Removing $item"
+              Remove-Item $item  -r -force
+            }
+          }
+        }
+        cd build/install/share/julia/artifacts && quiet_rm $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
+    - name: tar output
+      run: |
+        cd build\install && tar.exe -czf ..\..\libMad-windows-x86_64-${{ github.ref_name }}.tar.gz *
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-    - uses: julia-actions/install-juliaup@v2
-      with:
-        channel: ${{ matrix.julia-version }}
-    - name: Patch out GPU support
-      shell: bash
-      run: git apply no_gpu_patches/no_gpu.patch
-    - name: install JuliaC
-      run: julia -e 'using Pkg; Pkg.add(name="JuliaC", version="0.3.8"); Pkg.Apps.add(name="JuliaC", version="0.3.8")'
-    - name: add JuliaC to path
-      run: echo "$HOME/.julia/bin" >> "$GITHUB_PATH"
-    - name: build libMad
-      run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: libMad-windows-x86_64-${{ github.ref_name }}-cuda.tar.gz
+        asset_name: libMad-windows-x86_64-${{ github.ref_name }}-cuda.tar.gz
+        tag: ${{ github.ref }}
+        body: "Release ${{ github.ref_name }}"
