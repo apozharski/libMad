@@ -32,7 +32,7 @@ jobs:
     - name: trim out unnecessary artifacts
       run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
     - name: tar output
-      run: cd build/install && tar -czf ../../libMad-ubuntu-x86_64-${{ github.ref_name }}.tar.gz *
+      run: cd build/install && tar -czf ../../libMad-ubuntu-x86_64-${{ github.ref_name }}-cuda.tar.gz *
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
@@ -97,7 +97,7 @@ jobs:
         cd build/install/share/julia/artifacts && quiet_rm $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
     - name: tar output
       run: |
-        cd build\install && tar.exe -czf ..\..\libMad-windows-x86_64-${{ github.ref_name }}.tar.gz *
+        cd build\install && tar.exe -czf ..\..\libMad-windows-x86_64-${{ github.ref_name }}-cuda.tar.gz *
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
