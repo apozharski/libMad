@@ -28,11 +28,11 @@ jobs:
     - name: add JuliaC to path
       run: echo "$HOME/.julia/bin" >> "$GITHUB_PATH"
     - name: build libMad
-      run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target install --config Release
+      run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="libMad-ubuntu-x86_64-${{ github.ref_name }}-cuda" && cmake --build . --target install --config Release
     - name: trim out unnecessary artifacts
-      run: cd build/install/share/julia/artifacts && rm -rf $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
+      run: cd build/libMad-ubuntu-x86_64-${{ github.ref_name }}-cuda/share/julia/artifacts && rm -rf $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
     - name: tar output
-      run: cd build/install && tar -czf ../../libMad-ubuntu-x86_64-${{ github.ref_name }}-cuda.tar.gz *
+      run: tar -czf libMad-ubuntu-x86_64-${{ github.ref_name }}-cuda.tar.gz build/libMad-ubuntu-x86_64-${{ github.ref_name }}-cuda
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
@@ -73,10 +73,10 @@ jobs:
       run: echo "PATH=$HOME\.julia\bin;$env:PATH" >> $env:GITHUB_ENV
       shell: pwsh
     - name: build libMad
-      run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="install" && cmake --build . --target INSTALL --config Release
+      run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="libMad-windows-x86_64-${{ github.ref_name }}-cuda" && cmake --build . --target INSTALL --config Release
     - name: Add interface lib file for MSVC
       run: |
-        cd build/install
+        cd build/libMad-windows-x86_64-${{ github.ref_name }}-cuda
         if (!(Test-Path lib)){
           mkdir lib
         }
@@ -94,10 +94,10 @@ jobs:
             }
           }
         }
-        cd build/install/share/julia/artifacts && quiet_rm $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
+        cd build/libMad-windows-x86_64-${{ github.ref_name }}-cuda/share/julia/artifacts && quiet_rm $(julia --project=${{ github.workspace }} ${{ github.workspace }}/scripts/trim_cuda_artifacts.jl)
     - name: tar output
       run: |
-        cd build\install && tar.exe -czf ..\..\libMad-windows-x86_64-${{ github.ref_name }}-cuda.tar.gz *
+        tar.exe -czf libMad-windows-x86_64-${{ github.ref_name }}-cuda.tar.gz build/libMad-windows-x86_64-${{ github.ref_name }}-cuda
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
