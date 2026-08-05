@@ -45,6 +45,7 @@ This is necessary as python may load a different version of `libssl` than the on
 If using the library through a matlab interface on GNU/linux it is necessary to set the following preload:
 
 1. `LD_PRELOAD="/path/to/libmad/bundle/julia/libunwind.so"` This is necessary because Matlab ships it's own modified version of `libunwind` which causes segfaults during backtrace generation in `libMad`. **Be warned that this breaks the Matlab debugger, causing hard-crashes when attempting to open the debugger.**
+2. Currently Matlab+Windows is a broken configuration due to what we believe to be incompatible `libCurl-4.dll` between the `julia` runtime and the `Matlab` runtime. Due to windows not having an `LD_PRELOAD` style way of pre-empting loading (without resorting to `regedit` hacks), we do not have a work around at this time.
 
 ## Current development
 Requires `Julia 1.12+` and the [`JuliaC.jl` package](https://github.com/JuliaLang/JuliaC.jl).
