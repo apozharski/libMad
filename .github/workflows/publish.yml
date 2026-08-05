@@ -80,7 +80,7 @@ jobs:
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="libMad-windows-x86_64-${{ github.ref_name }}" && cmake --build . --target INSTALL --config Release
     - name: Add interface lib file for MSVC
       run: |
-        cd build/install
+        cd build/libMad-windows-x86_64-${{ github.ref_name }}
         if (!(Test-Path lib)){
           mkdir lib
         }
