@@ -33,7 +33,7 @@ jobs:
     - name: build libMad
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="libMad-ubuntu-x86_64-${{ github.ref_name }}" && cmake --build . --target install --config Release
     - name: tar output
-      run: tar -czf libMad-ubuntu-x86_64-${{ github.ref_name }}.tar.gz build/libMad-ubuntu-x86_64-${{ github.ref_name }}
+      run: cd build && tar -czf ../libMad-ubuntu-x86_64-${{ github.ref_name }}.tar.gz libMad-ubuntu-x86_64-${{ github.ref_name }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
@@ -87,7 +87,7 @@ jobs:
         cp bin/libMad.dll.a lib/Mad.lib
     - name: tar output
       run: |
-        tar.exe -czf libMad-windows-x86_64-${{ github.ref_name }}.tar.gz build\libMad-windows-x86_64-${{ github.ref_name }}
+        cd build && tar.exe -czf ..\libMad-windows-x86_64-${{ github.ref_name }}.tar.gz libMad-windows-x86_64-${{ github.ref_name }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
@@ -123,7 +123,7 @@ jobs:
       run: mkdir build && cd build && mkdir install && cmake .. -DCMAKE_INSTALL_PREFIX="libMad-apple-aarch64-${{ github.ref_name }}" && cmake --build . --target install --config Release
     - name: tar output
       run: |
-        tar -czf libMad-apple-aarch64-${{ github.ref_name }}.tar.gz build/libMad-apple-aarch64-${{ github.ref_name }}
+        cd build && tar -czf ../libMad-apple-aarch64-${{ github.ref_name }}.tar.gz libMad-apple-aarch64-${{ github.ref_name }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
