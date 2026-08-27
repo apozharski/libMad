@@ -30,6 +30,16 @@ The following are necessary for any interface:
 
 1. `JULIA_HSL_LIBRARY_PATH="path/to/hsl/lib"` This is necessary to use the HSL linear system solvers: `Ma*7Solver`.
 
+## Mac OS - ARM
+1. Downloading Julia HSL from Safari, sets a quarantine flag, meaning the library can't be loaded. To remove the quarantine:
+
+```bash
+xattr -d com.apple.quarantine \
+  "path/to/hsl/lib/libhsl.dylib" \
+  "path/to/hsl/lib/libhsl_subset.dylib" \
+  "path/to/hsl/lib/libhsl_subset_64.dylib"
+```
+
 ### CUDA
 1. `JULIA_CUDA_USE_COMPAT="false"` This is necessary to make sure that `CUDA_Driver_jll` does not attempt to fork a second julia process which fails as the binary does not exist.
 2. `JULIA_CUDSS_LIBRARY_PATH="path/to/cudss/lib"` This may be necessary if the `CUDA_Runtime_Discovery` package cannot find the cuDSS libraries.
