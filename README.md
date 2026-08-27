@@ -2,6 +2,12 @@
 `libMad` is a metapackage used to compile a shared library which contains a c interface for MadNLP.
 It is currently _very much_ a work in progress.
 
+## Quick Start
+`libMad` was initially built to support use of `MadNLP` and `CCOpt` in `CasADi`. If you are here for that installation in most cases is as easy as:
+1. Download the [latest release tarball](https://github.com/madsuite-org/libMad/releases).
+2. Untar the tarball.
+3. add the `lib` directory to `LD_LIBRARY_PATH` on linux, `DYLD_LIBRARY_PATH` on mac, or, on windows, add the `bin` directory to the `PATH`. 
+
 ## Installation
 `libMad` can be either installed from source or from a release tarball.
 
@@ -12,7 +18,7 @@ mkdir build && cd build && cmake -DCMAKE_INSTALL_PREFIX=<path/to/install/to> .. 
 ```
 
 ### Release Versions
-The best way to use `libMad` currently is by downloading the bundled releases available through the [Github Releases page](https://github.com/MadNLP/libMad/releases).
+The best way to use `libMad` currently is by downloading the bundled releases available through the [Github Releases page](https://github.com/madsuite-org/libMad/releases).
 These tarballs contain the full stand-alone bundle of libraries necessary to use `libMad` on the three supported platforms.
 In order to install them simply untar and add the path to the correct search path for your platform: `PATH` on windows, `LD_LIBRARY_PATH` on gnu/linux, and `DYLD_LIBRARY_PATH` on macos.
 If using libMad from `CasADi >=v3.8.0` (which is currently in prerelease) this should be sufficient for the `CasADi` plugin loader to to load the `madnlp` and `ccopt` plugin correctly.
@@ -51,11 +57,15 @@ And then several language specific issues may occur if the shared library is loa
 If using the library through a python interface on GNU/linux it may be necessary to set the following preload: `LD_PRELOAD="/path/to/libmad/bundle/julia/libssl.so"`.
 This is necessary as python may load a different version of `libssl` than the one that `libMad` was compiled against. This leads to a failure during dynamic loading and a crash.
 
+##### Python on Windows
+Due to issues with the way that python installed from the Microsoft Store handle the DLL load path (that is they _don't_, see [this related issue](https://github.com/JuliaLang/julia/issues/52007)) using these is not advised, and unsupported.
+Please use an alternate install of python, for example using [`micromamba`](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html) or [`uv`](https://docs.astral.sh/uv/getting-started/installation/).
+
 #### Matlab
 If using the library through a matlab interface on GNU/linux it is necessary to set the following preload:
 
 1. `LD_PRELOAD="/path/to/libmad/bundle/julia/libunwind.so"` This is necessary because Matlab ships it's own modified version of `libunwind` which causes segfaults during backtrace generation in `libMad`. **Be warned that this breaks the Matlab debugger, causing hard-crashes when attempting to open the debugger.**
-2. Currently Matlab+Windows is a broken configuration due to what we believe to be incompatible `libCurl-4.dll` between the `julia` runtime and the `Matlab` runtime. Due to windows not having an `LD_PRELOAD` style way of pre-empting loading (without resorting to `regedit` hacks), we do not have a work around at this time.
+2. Currently Matlab+Windows is a broken configuration due to what we believe to be incompatible `libCurl-4.dll` between the `julia` runtime and the `Matlab` runtime. Due to windows not having an `LD_PRELOAD` style way of pre-empting loading (without resorting to `)regedit` hacks), we do not have a work around at this time.
 
 ## Current development
 Requires `Julia 1.12+` and the [`JuliaC.jl` package](https://github.com/JuliaLang/JuliaC.jl).
